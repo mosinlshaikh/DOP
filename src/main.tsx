@@ -7,6 +7,7 @@ import {
   Link,
   NavLink,
   useNavigate,
+  useLocation,
   useParams,
 } from "react-router-dom";
 import {
@@ -1594,9 +1595,34 @@ function MasterHome({
   const nav = useNavigate();
   const [term, setTerm] = useState("");
   const [destination, setDestination] = useState("");
+  const [errors, setErrors] = useState<{ term?: string; destination?: string }>({});
+  const commandFormRef = useRef<HTMLFormElement>(null);
+  const termRef = useRef<HTMLInputElement>(null);
+  const destinationRef = useRef<HTMLInputElement>(null);
+  const submitFromKeyboard = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+      commandFormRef.current?.requestSubmit();
+    }
+  };
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    nav(`/shop${term ? `?q=${encodeURIComponent(term)}` : ""}`);
+    const cleanTerm = term.trim();
+    const cleanDestination = destination.trim();
+    const nextErrors: { term?: string; destination?: string } = {};
+    if (!cleanTerm) nextErrors.term = "Enter a product or grade to search.";
+    if (!cleanDestination) nextErrors.destination = "Enter the delivery port or country.";
+    setErrors(nextErrors);
+    if (nextErrors.term) {
+      termRef.current?.focus();
+      return;
+    }
+    if (nextErrors.destination) {
+      destinationRef.current?.focus();
+      return;
+    }
+    const params = new URLSearchParams({ q: cleanTerm, destination: cleanDestination });
+    nav(`/shop?${params.toString()}`);
   };
   return (
     <>
@@ -1654,26 +1680,54 @@ function MasterHome({
           <p className="kicker">PROCUREMENT COMMAND</p>
           <h2>Start with the requirement.</h2>
         </div>
-        <form onSubmit={submit}>
-          <label>
+        <form ref={commandFormRef} onSubmit={submit} noValidate>
+          <label className={errors.term ? "fieldError" : ""}>
             <Search />
-            <span>PRODUCT OR GRADE</span>
+            <span id="command-product-label">PRODUCT OR GRADE</span>
             <input
+              ref={termRef}
               value={term}
-              onChange={(e) => setTerm(e.target.value)}
+              onChange={(e) => {
+                setTerm(e.target.value);
+                if (errors.term) setErrors((current) => ({ ...current, term: undefined }));
+              }}
               placeholder="e.g. EN 590 diesel"
+              aria-labelledby="command-product-label"
+              aria-describedby={errors.term ? "command-product-error" : "command-product-help"}
+              aria-invalid={Boolean(errors.term)}
+              onKeyDown={submitFromKeyboard}
             />
+            <small
+              id={errors.term ? "command-product-error" : "command-product-help"}
+              role={errors.term ? "alert" : undefined}
+            >
+              {errors.term || "Search by product name, standard or grade."}
+            </small>
           </label>
-          <label>
+          <label className={errors.destination ? "fieldError" : ""}>
             <MapPin />
-            <span>DESTINATION</span>
+            <span id="command-destination-label">DESTINATION</span>
             <input
+              ref={destinationRef}
               value={destination}
-              onChange={(e) => setDestination(e.target.value)}
+              onChange={(e) => {
+                setDestination(e.target.value);
+                if (errors.destination) setErrors((current) => ({ ...current, destination: undefined }));
+              }}
               placeholder="Port or country"
+              aria-labelledby="command-destination-label"
+              aria-describedby={errors.destination ? "command-destination-error" : "command-destination-help"}
+              aria-invalid={Boolean(errors.destination)}
+              onKeyDown={submitFromKeyboard}
             />
+            <small
+              id={errors.destination ? "command-destination-error" : "command-destination-help"}
+              role={errors.destination ? "alert" : undefined}
+            >
+              {errors.destination || "Used only to frame logistics and quote review."}
+            </small>
           </label>
-          <button className="primary">
+          <button className="primary" type="submit">
             Search catalog <ArrowRight />
           </button>
         </form>
@@ -1854,10 +1908,17 @@ function MasterHome({
       </section>
       <section className="dubaiBridge">
         <div className="routeVisual">
-          <span>DUBAI</span>
-          <i />
-          <span>GLOBAL DESTINATIONS</span>
-          <Ship />
+          <img
+            src="assets/dop-dubai-global-logistics.png"
+            alt="Dubai skyline, international port, oil tanker and refinery representing global energy logistics"
+            loading="lazy"
+          />
+          <div className="routeSignal" aria-hidden="true">
+            <span>DUBAI</span>
+            <i />
+            <span>GLOBAL DESTINATIONS</span>
+            <Ship />
+          </div>
         </div>
         <div>
           <p className="kicker">DUBAI / GLOBAL</p>
@@ -2167,14 +2228,35 @@ function Shop({
   setFav: (x: number[]) => void;
   ping: (s: string) => void;
 }) {
-  const [q, setQ] = useState("");
-  const [cat, setCat] = useState("All");
+  const location = useLocation();
+  const nav = useNavigate();
+  const urlParams = new URLSearchParams(location.search);
+  const carriedQuery = urlParams.get("q")?.trim() || "";
+  const destination = urlParams.get("destination")?.trim() || "";
+  const carriedCategory = urlParams.get("cat")?.trim() || "All";
+  const [q, setQ] = useState(carriedQuery);
+  const [cat, setCat] = useState(
+    categories.includes(carriedCategory) ? carriedCategory : "All",
+  );
+  useEffect(() => {
+    setQ(carriedQuery);
+    setCat(categories.includes(carriedCategory) ? carriedCategory : "All");
+  }, [location.search]);
+  const normalizedQ = q.trim().toLowerCase();
   const list = products.filter(
     (p) =>
       p.active &&
       (cat === "All" || p.category === cat) &&
-      p.name.toLowerCase().includes(q.toLowerCase()),
+      (!normalizedQ ||
+        [p.name, p.grade, p.category].some((value) =>
+          value.toLowerCase().includes(normalizedQ),
+        )),
   );
+  const clearRequirement = () => {
+    setQ("");
+    setCat("All");
+    nav("/shop", { replace: true });
+  };
   return (
     <section className="page">
       <div className="pageTitle">
@@ -2185,9 +2267,26 @@ function Shop({
           quote.
         </p>
       </div>
+      {destination && (
+        <aside className="requirementContext" aria-label="Carried procurement requirement">
+          <MapPin aria-hidden="true" />
+          <div>
+            <span>REQUIREMENT CONTEXT</span>
+            <h2>Destination context: {destination}</h2>
+            <p>
+              Catalog matches are non-binding. Availability, freight, incoterm and
+              final quotation require commercial review.
+            </p>
+          </div>
+          <button type="button" onClick={clearRequirement}>
+            Clear requirement <X aria-hidden="true" />
+          </button>
+        </aside>
+      )}
       <div className="toolbar">
         <label>
           <Search />
+          <span className="srOnly">Search catalog</span>
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -2197,6 +2296,8 @@ function Shop({
         <div>
           {["All", ...categories].map((c) => (
             <button
+              type="button"
+              key={c}
               className={cat === c ? "active" : ""}
               onClick={() => setCat(c)}
             >
@@ -2231,6 +2332,11 @@ function Shop({
           <Search />
           <h3>No matching products</h3>
           <p>Clear the search or choose another category.</p>
+          {(q || cat !== "All" || destination) && (
+            <button type="button" className="secondary" onClick={clearRequirement}>
+              Clear filters
+            </button>
+          )}
         </div>
       )}
     </section>

@@ -1709,6 +1709,204 @@ footer b {
   transform: translateY(-2px) scale(1.025);
   filter: drop-shadow(0 2px 0 #fff0ae) drop-shadow(0 6px 0 #8f5e1a) drop-shadow(0 16px 16px #000e) drop-shadow(0 0 22px #58cfe73d) saturate(1.14) contrast(1.08);
 }
+
+/* Procurement command: validated requirement entry and carried catalog context. */
+.srOnly {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.commandDeck {
+  grid-template-columns: minmax(270px, .62fr) minmax(0, 1.38fr);
+  column-gap: clamp(42px, 5vw, 88px);
+  row-gap: 12px;
+  padding-block: clamp(46px, 5vw, 74px);
+  background:
+    linear-gradient(90deg, rgba(196, 145, 47, .08) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(180deg, #f7efe2, #eee1cf);
+}
+.commandDeck form {
+  border: 1px solid #b59e77;
+  background: rgba(255, 252, 245, .74);
+  box-shadow: 0 18px 48px rgba(55, 35, 12, .12);
+  grid-template-columns: minmax(210px, 1fr) minmax(210px, 1fr) minmax(170px, auto);
+  align-items: stretch;
+}
+.commandDeck label {
+  position: relative;
+  grid-template-columns: 30px minmax(0, 1fr);
+  grid-template-rows: auto 44px auto;
+  align-content: center;
+  min-height: 116px;
+  padding: 20px 22px 14px;
+  border-left: 0;
+  border-right: 1px solid #c6b28f;
+  transition: background .2s ease, box-shadow .2s ease;
+}
+.commandDeck label:focus-within {
+  background: #fffaf0;
+  box-shadow: inset 0 -3px #ad771c;
+}
+.commandDeck label > svg {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: center;
+  margin: 0;
+  color: #9a6715;
+}
+.commandDeck label > span,
+.commandDeck label > input,
+.commandDeck label > small { grid-column: 2; }
+.commandDeck label > span { grid-row: 1; color: #564839; font-weight: 800; }
+.commandDeck label > input {
+  grid-row: 2;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0;
+  color: #101a2a;
+}
+.commandDeck label > input::placeholder { color: #756b60; opacity: 1; }
+.commandDeck label > small {
+  grid-row: 3;
+  font-size: 10px;
+  line-height: 1.35;
+  color: #71675b;
+}
+.commandDeck label.fieldError {
+  background: #fff3ef;
+  box-shadow: inset 0 -3px #a73827;
+}
+.commandDeck label.fieldError > svg,
+.commandDeck label.fieldError > small { color: #922f21; }
+.commandDeck input:focus { outline: none; }
+.commandDeck form .primary {
+  min-height: 116px;
+  padding-inline: 28px;
+  border: 0;
+  border-radius: 0;
+  background: #07101d;
+  color: #f2ca71;
+  justify-content: center;
+  box-shadow: inset 4px 0 #bd8730;
+}
+.commandDeck form .primary:hover { background: #0d1b30; color: #ffe09a; }
+.commandDeck form .primary:focus-visible {
+  outline: 3px solid #9e6816;
+  outline-offset: 3px;
+}
+.commandDeck > small { margin-top: 4px; font-size: 11px; line-height: 1.5; }
+
+.requirementContext {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  margin: 0 0 24px;
+  padding: 22px 24px;
+  border-left: 4px solid #c49336;
+  background: linear-gradient(110deg, #122039, #08111f);
+  color: #f6f0e5;
+  box-shadow: 0 18px 46px rgba(4, 11, 23, .18);
+}
+.requirementContext > svg { width: 30px; height: 30px; color: #e1b65d; }
+.requirementContext span { color: #dcb35d; font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+.requirementContext h2 { margin: 3px 0 4px; font: 600 clamp(23px, 2.2vw, 32px) "Cormorant Garamond"; }
+.requirementContext p { margin: 0; color: #bac3cf; font-size: 13px; line-height: 1.55; }
+.requirementContext button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid #d6b56b66;
+  background: transparent;
+  color: #f0d185;
+  cursor: pointer;
+}
+.requirementContext button svg { width: 15px; }
+.requirementContext button:hover { background: #e6bd6320; }
+.requirementContext button:focus-visible { outline: 2px solid #f0ca71; outline-offset: 3px; }
+.empty .secondary { min-height: 44px; margin-top: 16px; }
+
+/* Dubai/global cinematic bridge. */
+.dubaiBridge { overflow: hidden; }
+.routeVisual {
+  height: clamp(360px, 35vw, 510px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  isolation: isolate;
+}
+.routeVisual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, #07101b 0%, transparent 18%, transparent 76%, #07101b 100%),
+    linear-gradient(0deg, #07101b 0%, transparent 24%, transparent 75%, #07101b 100%);
+  pointer-events: none;
+}
+.routeVisual > img {
+  position: absolute;
+  inset: -4%;
+  width: 108%;
+  height: 108%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(.92) contrast(1.08) brightness(.8);
+  mask-image: radial-gradient(ellipse at center, #000 48%, rgba(0,0,0,.9) 67%, transparent 94%);
+}
+.routeSignal {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 7% 34px;
+  font-size: 10px;
+  letter-spacing: .18em;
+  color: #f0c86e;
+  text-shadow: 0 2px 12px #000;
+}
+.routeSignal i { left: 18%; right: 18%; bottom: 51px; }
+.routeSignal svg { left: 47%; top: auto; bottom: 54px; width: 54px; height: 54px; }
+
+@media (max-width: 900px) {
+  .commandDeck { grid-template-columns: 1fr; }
+  .commandDeck form { grid-template-columns: 1fr 1fr; }
+  .commandDeck form .primary { grid-column: 1 / -1; min-height: 56px; box-shadow: inset 0 3px #bd8730; }
+  .commandDeck label { border-top: 0; min-height: 112px; }
+  .commandDeck label:nth-child(2) { border-right: 0; }
+  .commandDeck > small { grid-column: 1; }
+  .dubaiBridge .routeVisual { order: 0; }
+}
+@media (max-width: 620px) {
+  .commandDeck { padding: 42px 20px; }
+  .commandDeck form { grid-template-columns: minmax(0, 1fr); }
+  .commandDeck label,
+  .commandDeck label:nth-child(2) {
+    border: 0;
+    border-bottom: 1px solid #c6b28f;
+    min-height: 108px;
+    padding: 17px 16px 12px;
+  }
+  .commandDeck form .primary { grid-column: auto; width: 100%; min-height: 56px; }
+  .requirementContext { grid-template-columns: 36px minmax(0, 1fr); padding: 20px 16px; gap: 12px; }
+  .requirementContext button { grid-column: 1 / -1; width: 100%; justify-content: center; }
+  .routeVisual { height: 310px; width: calc(100% + 40px); margin-inline: -20px; }
+  .routeVisual > img { object-position: 56% center; }
+  .routeSignal { padding: 0 20px 26px; }
+  .routeSignal i { left: 19%; right: 19%; bottom: 43px; }
+  .routeSignal svg { bottom: 44px; width: 42px; height: 42px; }
+}
 @media (max-width: 620px) {
   .masthead {
     width: 100vw;
@@ -4916,5 +5114,37 @@ footer a { padding-block: 10px; }
     -webkit-mask-composite: source-in;
     mask-image: linear-gradient(90deg, transparent 0, #000 22%, #000 77%, transparent 100%), linear-gradient(180deg, transparent 0, #000 20%, #000 74%, transparent 100%);
     mask-composite: intersect;
+  }
+}
+
+/* Procurement command evaluator refinement: proportional action and tablet stack. */
+@media (min-width: 901px) {
+  .commandDeck form { align-items: center; }
+  .commandDeck form .primary {
+    align-self: center;
+    min-height: 56px;
+    height: 56px;
+    margin-inline: 18px;
+    padding-inline: 22px;
+    box-shadow: inset 3px 0 #bd8730;
+  }
+}
+@media (max-width: 900px) {
+  .commandDeck form {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .commandDeck form label,
+  .commandDeck form label:nth-child(2) {
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #c6b28f;
+  }
+  .commandDeck form .primary {
+    grid-column: 1;
+    width: 100%;
+    min-height: 56px;
+    height: 56px;
+    margin: 0;
   }
 }
