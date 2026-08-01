@@ -1499,6 +1499,241 @@ footer b {
   .glassMark::after { border-color: #f1d17b18; }
 }
 
+/* Final cascade guard: the logo is an object, never a panel. */
+.masthead .glassMark,
+.masthead .glassMark:hover,
+.masthead .glassMark:focus-visible {
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  transform: translateZ(0);
+}
+.masthead .glassMark::before,
+.masthead .glassMark::after,
+.masthead .logoDepth,
+.masthead .logoSweep { display: none; }
+.masthead .glassMark img {
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 2px 0 #f1d17b99) drop-shadow(0 5px 0 #825215) drop-shadow(0 13px 13px #000d) drop-shadow(0 0 16px #58cfe729) saturate(1.08) contrast(1.08);
+}
+.masthead .glassMark:hover img,
+.masthead .glassMark:focus-visible img {
+  transform: translateY(-2px) scale(1.025);
+  filter: drop-shadow(0 2px 0 #fff0ae) drop-shadow(0 6px 0 #8f5e1a) drop-shadow(0 16px 16px #000e) drop-shadow(0 0 22px #58cfe73d) saturate(1.14) contrast(1.08);
+}
+@media (max-width: 620px) {
+  .masthead {
+    width: 100vw;
+    max-width: 100vw;
+    padding-right: 76px;
+    overflow: hidden;
+  }
+  .masthead .menuButton {
+    display: flex !important;
+    right: 14px;
+    top: 23px;
+    width: 46px;
+    height: 46px;
+    z-index: 8;
+  }
+  .masthead .mastIdentity { width: 150px; }
+}
+
+/* Frameless brand emblem, hero watermark and premium product miniatures */
+.glassMark,
+.glassMark:hover,
+.glassMark:focus-visible {
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  transform: translateZ(0);
+}
+.glassMark::before,
+.glassMark::after,
+.glassMark .logoDepth,
+.glassMark .logoSweep { display: none; }
+.glassMark .logoHalo {
+  z-index: -1;
+  inset: 8% -18%;
+  background: radial-gradient(ellipse, #58cfe735 0, #d9aa4930 34%, transparent 72%);
+  filter: blur(18px);
+  opacity: .85;
+}
+.glassMark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 2px 0 #f1d17b99)
+    drop-shadow(0 5px 0 #825215)
+    drop-shadow(0 13px 13px #000d)
+    drop-shadow(0 0 16px #58cfe729)
+    saturate(1.08) contrast(1.08);
+  transition: filter .3s ease, transform .3s ease;
+}
+.glassMark:hover img,
+.glassMark:focus-visible img {
+  transform: translateY(-2px) scale(1.025);
+  filter:
+    drop-shadow(0 2px 0 #fff0ae)
+    drop-shadow(0 6px 0 #8f5e1a)
+    drop-shadow(0 16px 16px #000e)
+    drop-shadow(0 0 22px #58cfe73d)
+    saturate(1.14) contrast(1.08);
+}
+.glassMark:focus-visible { outline: 2px solid #58cfe7; outline-offset: 7px; }
+
+.heroBrandWatermark {
+  position: absolute;
+  z-index: 1;
+  width: min(760px, 56vw);
+  height: min(570px, 76%);
+  right: 3.5vw;
+  top: 50%;
+  transform: translateY(-50%) scale(1.04);
+  object-fit: contain;
+  opacity: .115;
+  filter: grayscale(.15) sepia(.16) saturate(1.2) drop-shadow(0 30px 55px #000);
+  mix-blend-mode: screen;
+  mask-image: radial-gradient(ellipse at center, #000 28%, #000c 56%, transparent 82%);
+  pointer-events: none;
+}
+.heroAtmosphere { position: relative; z-index: 1; }
+.terminalArt { position: relative; z-index: 1; }
+.masterCopy { z-index: 3; }
+
+.masterProducts .product {
+  overflow: hidden;
+  border-color: #d4a64f2e;
+  box-shadow: 0 25px 55px #0007;
+  transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.masterProducts .product:hover {
+  transform: translateY(-7px);
+  border-color: #d4a64f6b;
+  box-shadow: 0 32px 72px #000b, 0 0 30px #58cfe70d;
+}
+.masterProducts .product:nth-child(2):hover { transform: translateY(25px); }
+.masterProducts .productVisual {
+  height: 300px;
+  isolation: isolate;
+  perspective: 850px;
+}
+.masterProducts .productVisual::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 20%, #fff9 43%, transparent 46%);
+  transform: translateX(-120%);
+  opacity: .12;
+  transition: transform .8s ease;
+}
+.masterProducts .product:hover .productVisual::before { transform: translateX(120%); }
+.productMiniature {
+  width: 210px;
+  height: 205px;
+  display: grid;
+  place-items: end center;
+  position: relative;
+  transform: rotateY(-7deg) rotateX(2deg);
+  transform-style: preserve-3d;
+  transition: transform .35s ease;
+}
+.productMiniature::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 13%; right: 4%; bottom: -4px;
+  height: 27px;
+  border-radius: 50%;
+  background: #000c;
+  filter: blur(11px);
+  transform: rotate(-3deg);
+}
+.product:hover .productMiniature { transform: rotateY(1deg) rotateX(0) translateY(-4px); }
+
+.drum3d {
+  width: 124px; height: 172px; position: relative;
+  border-radius: 12px 12px 18px 18px;
+  background:
+    linear-gradient(90deg, #010307 0, #07131f 10%, #173b58 28%, #1f597d 46%, #0d2941 66%, #02070d 91%, #000 100%);
+  border-left: 1px solid #69b2d644;
+  border-right: 2px solid #000;
+  box-shadow: inset 13px 0 16px #4fc8ed12, inset -16px 0 19px #000b, 24px 28px 35px #000c;
+}
+.drumTop {
+  position: absolute; left: -1px; right: -1px; top: -10px; height: 23px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 42% 35%, #526b79, #0a1822 44%, #020407 72%);
+  border: 3px solid #b97a17;
+  box-shadow: inset 0 3px #f1d17b99, 0 4px 8px #000;
+}
+.drumHoop { position:absolute; left:-4px; right:-4px; height:7px; border-radius:50%; background:linear-gradient(#f1d17b,#8c5810 62%,#372000); box-shadow:0 2px 4px #000; }
+.drumHoopTop { top: 43px; } .drumHoopBottom { bottom: 32px; }
+.drumBadge { position:absolute; inset:68px 20px auto; height:49px; display:grid; place-content:center; text-align:center; border:1px solid #e9c46988; background:linear-gradient(145deg,#06111deb,#0c2639d9); box-shadow:inset 0 0 14px #58cfe71e; font-style:normal; }
+.drumBadge b { color:#efca69; font:700 22px/1 "Cormorant Garamond"; letter-spacing:.08em; }
+.drumBadge small { color:#b6d5df; font:700 7px/1.5 Manrope; letter-spacing:.22em; }
+.drumFoot { position:absolute; left:4px; right:4px; bottom:-4px; height:12px; border-radius:50%; background:#020406; border-bottom:3px solid #8f5c17; }
+
+.ibc3d { width:166px; height:160px; position:relative; margin-bottom:8px; transform:skewY(-1deg); }
+.ibcTank { position:absolute; inset:11px 8px 18px; border-radius:13px 13px 8px 8px; background:linear-gradient(90deg,#665b3f99,#d9c592d4 28%,#f5e3b3e8 52%,#837653b8 87%); box-shadow:inset 12px 0 18px #fff3,inset -20px 0 22px #12100bb8; }
+.ibcFluid { position:absolute; z-index:1; left:9px; right:9px; bottom:19px; height:78px; border-radius:0 0 8px 8px; background:linear-gradient(90deg,#8b5b0ac9,#d99a1de0 45%,#6e4007dc); box-shadow:inset 0 10px 13px #f2cb5c38; }
+.ibcCap { position:absolute; z-index:5; width:30px; height:10px; left:66px; top:2px; background:linear-gradient(#222,#050505); border:2px solid #777; border-radius:50%; }
+.ibcCage { position:absolute; z-index:3; display:block; background:linear-gradient(90deg,#3a4146,#c5ccd0 48%,#3e4447); box-shadow:1px 1px 2px #0009; }
+.cageH { left:0; right:0; height:5px; } .cageH1 { top:54px; } .cageH2 { top:105px; }
+.cageV { top:10px; bottom:18px; width:5px; } .cageV1 { left:3px; } .cageV2 { left:80px; } .cageV3 { right:3px; }
+.ibc3d::before,.ibc3d::after { content:""; position:absolute; z-index:3; top:11px; bottom:18px; width:5px; background:linear-gradient(90deg,#444,#cbd0d3,#42474a); }
+.ibc3d::before { left:40px; } .ibc3d::after { right:40px; }
+.ibcValve { position:absolute; z-index:5; width:27px; height:21px; left:69px; bottom:12px; border-radius:5px 5px 9px 9px; background:linear-gradient(90deg,#111,#4d5559,#090b0c); border:2px solid #92989b; }
+.ibcPallet { position:absolute; z-index:4; left:-7px; right:-7px; bottom:0; height:18px; background:linear-gradient(#5a6266,#15191b); border-top:3px solid #c2c7c9; box-shadow:0 8px 11px #000c; }
+
+.canister3d {
+  width:116px; height:170px; position:relative; margin-bottom:4px;
+  border-radius:20px 19px 11px 14px;
+  clip-path:polygon(22% 0,78% 0,100% 19%,100% 100%,0 100%,0 18%);
+  background:linear-gradient(90deg,#010307,#07162a 14%,#164b79 38%,#0b3158 64%,#020810 91%);
+  box-shadow:inset 14px 0 17px #58cfe71b,inset -17px 0 20px #000c,25px 29px 38px #000d;
+}
+.canister3d::after { content:""; position:absolute; inset:4px; border:1px solid #8dcbe329; clip-path:inherit; border-radius:17px; }
+.canisterHandle { position:absolute; z-index:3; width:49px; height:36px; left:35px; top:9px; border:10px solid #02060b; border-bottom-width:8px; border-radius:14px 14px 7px 7px; box-shadow:inset 0 2px #306993; }
+.canisterCap { position:absolute; z-index:4; width:34px; height:14px; right:8px; top:0; border-radius:4px 4px 2px 2px; background:repeating-linear-gradient(90deg,#9b681a 0 3px,#edc76d 3px 5px); box-shadow:0 3px 5px #000; }
+.canisterShoulder { position:absolute; left:9px; right:9px; top:51px; height:2px; background:linear-gradient(90deg,transparent,#72d3ec77,transparent); }
+.canisterLabel { position:absolute; z-index:2; left:15px; right:12px; top:65px; bottom:22px; display:grid; place-content:center; text-align:center; font-style:normal; background:linear-gradient(145deg,#0b1119,#081e31); border:1px solid #d7ad5199; box-shadow:inset 0 0 17px #58cfe71b,0 5px 10px #0008; transform:skewY(-1deg); }
+.canisterLabel b { font:700 25px/1 "Cormorant Garamond"; color:#efca69; letter-spacing:.08em; }
+.canisterLabel small { margin-top:8px; color:#e3edf0; font:700 7px/1.3 Manrope; letter-spacing:.13em; }
+
+@media (max-width: 900px) {
+  .heroBrandWatermark { width: 650px; max-width: 82vw; right: -12vw; opacity: .09; }
+  .masterProducts .product:nth-child(2),
+  .masterProducts .product:nth-child(2):hover { transform: none; }
+}
+@media (max-width: 560px) {
+  .masterHero { min-height: 720px; padding-top: 62px; padding-bottom: 80px; }
+  .heroBrandWatermark { width: 440px; max-width: 118vw; height: 420px; right: -23vw; top: 67%; opacity: .1; }
+  .masterCopy h1 { font-size: clamp(47px, 14vw, 58px); line-height: .91; }
+  .masterCopy ul { flex-direction: column; gap: 12px; margin-top: 27px; }
+  .masterProducts .productVisual { height: 270px; }
+  .productMiniature { transform: scale(.93) rotateY(-5deg); }
+  .masterProducts .product:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glassMark img,
+  .masterProducts .product,
+  .productMiniature,
+  .masterProducts .productVisual::before { transition: none !important; }
+  .masterProducts .product:hover,
+  .masterProducts .product:nth-child(2):hover,
+  .product:hover .productMiniature { transform: none; }
+}
+
 /* 3D supply collection + dimensional masthead emblem */
 .glassMark {
   position: relative;
@@ -4303,4 +4538,199 @@ button:disabled {
     box-shadow: inset 0 -6px 12px #0007;
   }
   .glassMark::after { border-color: #f1d17b18; }
+}
+
+/* Definitive masthead rules kept last to defeat legacy logo-panel declarations. */
+.masthead .glassMark,
+.masthead .glassMark:hover,
+.masthead .glassMark:focus-visible {
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  transform: translateZ(0);
+}
+.masthead .glassMark::before,
+.masthead .glassMark::after,
+.masthead .logoDepth,
+.masthead .logoSweep { display: none; }
+.masthead .glassMark img {
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 2px 0 #f1d17b99) drop-shadow(0 5px 0 #825215) drop-shadow(0 13px 13px #000d) drop-shadow(0 0 16px #58cfe729) saturate(1.08) contrast(1.08);
+}
+.masthead .glassMark:hover img,
+.masthead .glassMark:focus-visible img {
+  transform: translateY(-2px) scale(1.025);
+  filter: drop-shadow(0 2px 0 #fff0ae) drop-shadow(0 6px 0 #8f5e1a) drop-shadow(0 16px 16px #000e) drop-shadow(0 0 22px #58cfe73d) saturate(1.14) contrast(1.08);
+}
+@media (max-width: 620px) {
+  .masthead { padding-right: 76px; }
+  .masthead .menuButton {
+    display: flex !important;
+    right: 14px;
+    top: 23px;
+    width: 46px;
+    height: 46px;
+    z-index: 8;
+  }
+  .masterHero,
+  .marketPulse,
+  .commandDeck,
+  .masterSection,
+  .packagingStory,
+  .distillationSection,
+  .framework,
+  .dubaiBridge,
+  .finalRfq { width: 100%; max-width: 100vw; min-width: 0; }
+  .masterCopy { width: 100%; min-width: 0; }
+  .masterCopy > p:not(.kicker) { width: 100%; max-width: 100%; overflow-wrap: anywhere; }
+}
+
+/* Evaluator pass 2: composition, alignment, touch targets and media integration. */
+.heroBrandWatermark {
+  left: 30%;
+  right: auto;
+  width: min(720px, 55vw);
+  opacity: .22;
+  filter: sepia(.15) saturate(1.25) brightness(1.16) drop-shadow(0 28px 50px #000b);
+  mix-blend-mode: screen;
+  mask-image: radial-gradient(ellipse at center, #000 26%, #000e 55%, transparent 83%);
+}
+.heroAtmosphere { overflow: visible; }
+.terminalArt {
+  mask-image: radial-gradient(ellipse at 57% 48%, #000 30%, #000f 53%, #0008 68%, transparent 88%);
+}
+
+.masterProducts { align-items: stretch; }
+.masterProducts .product,
+.masterProducts .product:nth-child(2),
+.masterProducts .product:nth-child(2):hover {
+  transform: none;
+  align-self: stretch;
+}
+.masterProducts .product:hover { transform: translateY(-7px); }
+.masterProducts .productBody { padding-right: 30px; }
+.masterProducts .product h3 { min-width: 0; }
+.masterProducts .product h3 a {
+  display: block;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.08;
+}
+
+.productActions a,
+.productActions button,
+.masterHeading.row > a,
+.marketPulse > a,
+.packagingCopy a,
+.distillationSection a,
+footer a {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.productActions button { height: 44px; }
+footer a { padding-block: 10px; }
+.marketPulse > a { justify-content: flex-end; }
+
+.distillationGlass {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+.distillationGlass::before {
+  inset: -2px;
+  background:
+    linear-gradient(90deg, #06090e 0, transparent 17%, transparent 78%, #06090e 100%),
+    linear-gradient(180deg, #06090e 0, transparent 13%, transparent 82%, #06090e 100%);
+}
+.distillationGlass img {
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  mask-image: radial-gradient(ellipse at 50% 50%, #000 42%, #000e 62%, transparent 94%);
+}
+
+@media (min-width: 621px) and (max-width: 900px) {
+  .marketPulse {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 44px 76px;
+    height: 126px;
+    padding-block: 4px;
+  }
+  .pulseLabel { grid-column: 1; grid-row: 1; }
+  .tickerViewport {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #d4a64f88 #0d1721;
+    overscroll-behavior-inline: contain;
+    box-shadow: inset -22px 0 18px -20px #e0b65fa8;
+  }
+  .tickerViewport tv-ticker-tape { min-width: 760px; }
+  .marketPulse > a {
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-end;
+    padding-inline: 4px;
+  }
+  .heroBrandWatermark { left: 22%; width: 68vw; opacity: .2; }
+  .heroAtmosphere::after { inset: -4%; background: radial-gradient(ellipse at 58% 52%, transparent 32%, #06101c9c 72%, #06101c 94%); }
+  .terminalArt { mask-image: radial-gradient(ellipse at 58% 50%, #000 22%, #000e 48%, #0007 65%, transparent 86%); }
+}
+@media (max-width: 620px) {
+  .masterHero { min-height: 650px; padding-top: 34px; }
+  .heroBrandWatermark { left: 20%; top: 62%; width: 92vw; max-width: none; opacity: .19; }
+  .masterProducts .product:hover { transform: none; }
+  .marketPulse > a { justify-content: flex-start; }
+  .tickerViewport { overflow-x: auto; overscroll-behavior-inline: contain; scrollbar-width: thin; }
+  .tickerViewport tv-ticker-tape { min-width: 560px; }
+}
+
+/* Asset integration: no decorative image should read as a picture in a frame. */
+.categoryObject.industrialOil {
+  left: 0;
+  top: 0;
+  translate: none;
+  transform-origin: center;
+  align-self: center;
+}
+.heroAtmosphere::after {
+  display: none;
+}
+.terminalArt {
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18%, #000 82%, transparent 100%), linear-gradient(180deg, transparent 0, #000 16%, #000 78%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent 0, #000 18%, #000 82%, transparent 100%), linear-gradient(180deg, transparent 0, #000 16%, #000 78%, transparent 100%);
+  mask-composite: intersect;
+}
+.packagingArt { isolation: isolate; }
+.packagingArt img {
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  mask-image: linear-gradient(90deg, #000 0, #000 72%, transparent 100%);
+}
+@media (max-width: 900px) {
+  .packagingArt img { mask-image: linear-gradient(180deg, #000 0, #000 68%, transparent 100%); }
+  .heroAtmosphere::after { display: none; }
+  .terminalArt {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22%, #000 77%, transparent 100%), linear-gradient(180deg, transparent 0, #000 20%, #000 74%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent 0, #000 22%, #000 77%, transparent 100%), linear-gradient(180deg, transparent 0, #000 20%, #000 74%, transparent 100%);
+    mask-composite: intersect;
+  }
 }

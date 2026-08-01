@@ -399,7 +399,6 @@ function NewShell({
       <header className="masthead">
         <Link to="/" className="glassMark" aria-label="DOP home">
           <span className="logoHalo" aria-hidden="true" />
-          <span className="logoDepth" aria-hidden="true" />
           <img src="assets/dop-logo-transparent.png" alt="DOP" />
           <span className="logoSweep" aria-hidden="true" />
         </Link>
@@ -1554,6 +1553,12 @@ function MasterHome({
   return (
     <>
       <section className="masterHero">
+        <img
+          className="heroBrandWatermark"
+          src="assets/dop-logo-transparent.png"
+          alt=""
+          aria-hidden="true"
+        />
         <div className="heroAtmosphere">
           <img
             className="terminalArt"
@@ -2033,12 +2038,36 @@ function ProductCard({
     <article className="product">
       <div className={`productVisual visual-${visual}`}>
         <span>{p.category}</span>
-        <div
-          className={
-            visual === 1 ? "ibc" : visual === 2 ? "packaged" : "barrel"
-          }
-        >
-          <div />
+        <div className="productMiniature" aria-hidden="true">
+          {visual === 1 ? (
+            <div className="ibc3d">
+              <i className="ibcCap" />
+              <i className="ibcTank" />
+              <i className="ibcFluid" />
+              <i className="ibcCage cageH cageH1" />
+              <i className="ibcCage cageH cageH2" />
+              <i className="ibcCage cageV cageV1" />
+              <i className="ibcCage cageV cageV2" />
+              <i className="ibcCage cageV cageV3" />
+              <i className="ibcValve" />
+              <i className="ibcPallet" />
+            </div>
+          ) : visual === 2 ? (
+            <div className="canister3d">
+              <i className="canisterHandle" />
+              <i className="canisterCap" />
+              <i className="canisterShoulder" />
+              <i className="canisterLabel"><b>DOP</b><small>ENGINE OIL</small></i>
+            </div>
+          ) : (
+            <div className="drum3d">
+              <i className="drumTop" />
+              <i className="drumHoop drumHoopTop" />
+              <i className="drumHoop drumHoopBottom" />
+              <i className="drumBadge"><b>DOP</b><small>ULSD</small></i>
+              <i className="drumFoot" />
+            </div>
+          )}
         </div>
         {toggle && (
           <button
