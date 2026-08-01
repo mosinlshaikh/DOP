@@ -2852,12 +2852,13 @@ button:disabled {
   border-bottom: 1px solid #9d9589;
 }
 .purposeFlow li {
-  min-height: 235px;
+  min-height: 330px;
   padding: 25px 22px;
   border-right: 1px solid #aaa195;
   display: grid;
-  grid-template-rows: auto 55px auto;
+  grid-template-rows: auto 150px auto;
   align-content: start;
+  perspective: 700px;
 }
 .purposeFlow li:last-child {
   border: 0;
@@ -2866,11 +2867,188 @@ button:disabled {
   font-size: 12px;
   color: #8b5c12;
 }
-.purposeFlow svg {
-  width: 34px;
-  height: 34px;
-  color: #9b6818;
-  margin-top: 20px;
+.workflowObject {
+  --object-accent: #6fd9e9;
+  position: relative;
+  width: 138px;
+  height: 126px;
+  margin: 10px auto 14px;
+  transform-style: preserve-3d;
+  transition: transform 420ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+.purposeFlow li:hover .workflowObject {
+  transform: translateY(-6px) rotateX(3deg) rotateY(-4deg);
+}
+.workflowObject__shadow {
+  position: absolute;
+  z-index: 0;
+  left: 18px;
+  right: 10px;
+  bottom: 5px;
+  height: 25px;
+  border-radius: 50%;
+  background: #07111e80;
+  filter: blur(11px);
+  transform: rotate(-4deg);
+  transition: opacity 420ms ease, transform 420ms ease;
+}
+.purposeFlow li:hover .workflowObject__shadow {
+  opacity: 0.65;
+  transform: translateY(7px) rotate(-4deg) scale(0.92);
+}
+.workflowObject__plinth {
+  position: absolute;
+  z-index: 1;
+  left: 15px;
+  right: 15px;
+  bottom: 11px;
+  height: 30px;
+  border: 1px solid #e8c66a;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #f4d77d 0 9%, #8f5b14 16%, #171b20 47%, #02080e 78%, #b17b25 100%);
+  box-shadow: inset 0 2px 2px #fff5bd87, 0 8px 10px #03101a66;
+  transform: rotateX(54deg);
+}
+.workflowObject__plinth span {
+  position: absolute;
+  inset: 7px 15px;
+  border: 1px solid #e5bc5c66;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, #15304a, #03080d 70%);
+}
+.workflowObject__body {
+  position: absolute;
+  z-index: 2;
+  left: 27px;
+  top: 10px;
+  width: 84px;
+  height: 88px;
+  display: grid;
+  place-items: center;
+  color: #f7d677;
+  border: 2px solid #c99637;
+  background:
+    radial-gradient(circle at 70% 76%, #0c86a744, transparent 35%),
+    linear-gradient(135deg, #50698588 0%, #091a2c 27%, #02070d 67%, #203950 100%);
+  box-shadow:
+    inset 1px 1px 1px #eaf9ff80,
+    inset -8px -10px 20px #000b,
+    0 10px 18px #03101a73,
+    0 0 0 3px #071323,
+    0 0 0 4px #dfb65188;
+  transform: translateZ(24px);
+  overflow: hidden;
+}
+.workflowObject__body::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid #88d8ed29;
+  pointer-events: none;
+}
+.workflowObject__body svg {
+  position: relative;
+  z-index: 3;
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  stroke-width: 1.45;
+  filter: drop-shadow(0 2px 1px #000) drop-shadow(0 0 5px #e3b8515e);
+}
+.workflowObject__glint {
+  position: absolute;
+  z-index: 4;
+  top: -20px;
+  left: 8px;
+  width: 16px;
+  height: 140px;
+  background: linear-gradient(90deg, transparent, #fff9, transparent);
+  transform: rotate(31deg);
+  opacity: 0.28;
+  transition: transform 600ms ease, opacity 600ms ease;
+}
+.purposeFlow li:hover .workflowObject__glint {
+  transform: translateX(56px) rotate(31deg);
+  opacity: 0.5;
+}
+.workflowObject__detail {
+  position: absolute;
+  z-index: 1;
+}
+.workflowObject--discover .workflowObject__body {
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle, transparent 0 13px, #58c9e31f 14px 15px),
+    repeating-conic-gradient(from 0deg, #55cce625 0 1deg, transparent 1deg 30deg),
+    radial-gradient(circle at 42% 35%, #123e62, #02080f 72%);
+}
+.workflowObject--discover .workflowObject__detail {
+  width: 19px;
+  height: 27px;
+  bottom: 17px;
+  left: 31px;
+  border-radius: 70% 30% 65% 35%;
+  background: linear-gradient(135deg, #fff2a9, #bb781d 50%, #50300a);
+  transform: rotate(45deg);
+  box-shadow: inset 3px 3px 5px #fff5, 0 0 9px #e5b64c66;
+}
+.workflowObject--discover svg { transform: translate(15px, -13px) rotate(-7deg); }
+.workflowObject--configure .workflowObject__body {
+  border-radius: 20px 5px 20px 5px;
+}
+.workflowObject--configure .workflowObject__detail {
+  inset: 12px;
+  border-radius: 50%;
+  border: 1px dashed #6ad9ed73;
+  box-shadow: inset 0 0 14px #58d9ef24;
+}
+.workflowObject--configure svg {
+  width: 50px;
+  height: 50px;
+  filter: drop-shadow(2px 3px 1px #000) drop-shadow(-1px -1px 0 #ffe9a4);
+}
+.workflowObject--qualify .workflowObject__body {
+  left: 31px;
+  width: 76px;
+  border-radius: 9px 9px 18px 18px;
+  clip-path: polygon(10% 0, 90% 0, 100% 12%, 94% 78%, 50% 100%, 6% 78%, 0 12%);
+  background: linear-gradient(145deg, #735223, #f0ce73 22%, #604116 30%, #0b1b2b 55%, #02070c 80%, #967028);
+}
+.workflowObject--qualify .workflowObject__body::after { border-radius: 7px 7px 17px 17px; }
+.workflowObject--qualify .workflowObject__detail {
+  top: 18px;
+  left: 22px;
+  width: 30px;
+  height: 3px;
+  background: #d8b55c;
+  box-shadow: 0 8px #d8b55c88, 0 16px #d8b55c55;
+}
+.workflowObject--qualify svg { transform: translateY(14px); }
+.workflowObject--track .workflowObject__body {
+  left: 18px;
+  width: 102px;
+  height: 78px;
+  top: 16px;
+  border-radius: 7px;
+  background:
+    linear-gradient(#6edcf012 1px, transparent 1px),
+    linear-gradient(90deg, #6edcf012 1px, transparent 1px),
+    radial-gradient(circle at 70% 35%, #0b638d77, transparent 35%),
+    linear-gradient(145deg, #152f47, #02070d 70%);
+  background-size: 13px 13px, 13px 13px, auto, auto;
+}
+.workflowObject--track .workflowObject__detail {
+  left: 17px;
+  right: 17px;
+  bottom: 14px;
+  height: 3px;
+  background: linear-gradient(90deg, #c38a24 0 24%, #57d5ea 24% 58%, #e4c66b 58% 100%);
+  box-shadow: 0 0 9px #5ed9ed;
+}
+.workflowObject--track svg {
+  width: 64px;
+  color: #76e9f5;
+  filter: drop-shadow(0 0 5px #3ed7ec) drop-shadow(1px 2px 1px #000);
 }
 .purposeFlow b {
   font: 600 27px "Cormorant Garamond";
@@ -3064,6 +3242,9 @@ button:disabled {
   .purposeFlow li:nth-child(-n + 2) {
     border-bottom: 1px solid #aaa195;
   }
+  .purposeFlow li {
+    min-height: 315px;
+  }
   .benchmarkPrices {
     grid-template-columns: 1fr 1fr;
   }
@@ -3087,10 +3268,10 @@ button:disabled {
     margin: 50px 0;
   }
   .purposeFlow li {
-    min-height: 170px;
+    min-height: 205px;
     border-right: 0;
     border-bottom: 1px solid #aaa195 !important;
-    grid-template-columns: 34px 46px 1fr;
+    grid-template-columns: 34px 116px 1fr;
     grid-template-rows: auto;
     gap: 12px;
     align-items: start;
@@ -3098,8 +3279,15 @@ button:disabled {
   .purposeFlow li:last-child {
     border-bottom: 0 !important;
   }
-  .purposeFlow svg {
-    margin: 0;
+  .workflowObject {
+    width: 112px;
+    height: 118px;
+    margin: -6px 0 0;
+    transform: scale(0.82);
+    transform-origin: top left;
+  }
+  .purposeFlow li:hover .workflowObject {
+    transform: scale(0.82) translateY(-4px) rotateX(3deg) rotateY(-4deg);
   }
   .purposeFlow b {
     font-size: 26px;
@@ -3164,6 +3352,16 @@ button:disabled {
   .chartFallback a,
   .chartAttribution {
     font-size: 15px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workflowObject,
+  .workflowObject__shadow,
+  .workflowObject__glint {
+    transition: none;
+  }
+  .purposeFlow li:hover .workflowObject {
+    transform: none;
   }
 }
 

@@ -736,28 +736,45 @@ function PurposeAndBenchmarks() {
             Search,
             "Discover",
             "Explore physical fuels, lubricants and industrial oils.",
+            "discover",
           ],
           [
             Settings2,
             "Configure",
             "Define grade, volume, packaging, destination and incoterm.",
+            "configure",
           ],
           [
             ClipboardCheck,
             "Qualify",
             "Review buyer requirements and requested documentation.",
+            "qualify",
           ],
           [
             Activity,
             "Track",
             "Follow the status of a structured RFQ in the workspace.",
+            "track",
           ],
-        ].map(([I, title, copy], i) => {
+        ].map(([I, title, copy, object], i) => {
           const Icon = I as typeof Search;
           return (
             <li key={title as string}>
               <span>0{i + 1}</span>
-              <Icon />
+              <div
+                className={`workflowObject workflowObject--${object}`}
+                aria-hidden="true"
+              >
+                <div className="workflowObject__shadow" />
+                <div className="workflowObject__plinth">
+                  <span />
+                </div>
+                <div className="workflowObject__body">
+                  <span className="workflowObject__glint" />
+                  <span className="workflowObject__detail" />
+                  <Icon />
+                </div>
+              </div>
               <div>
                 <b>{title as string}</b>
                 <p>{copy as string}</p>
