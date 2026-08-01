@@ -39,6 +39,9 @@ import {
   Factory,
   FileCheck2,
   Route as RouteIcon,
+  Settings2,
+  ClipboardCheck,
+  Activity,
 } from "lucide-react";
 import "./styles.css";
 
@@ -52,7 +55,7 @@ type Product = {
   featured: boolean;
   active: boolean;
 };
-type UserT = { name: string; email: string; role: "customer" | "admin" };
+type UserT = { name: string; email: string };
 const seed: Product[] = [
   {
     id: 1,
@@ -130,7 +133,7 @@ const App = () => {
   const [products, setProducts] = usePersist<Product[]>("dop-products", seed);
   const [cart, setCart] = usePersist<number[]>("dop-cart", []);
   const [fav, setFav] = usePersist<number[]>("dop-fav", []);
-  const [user, setUser] = usePersist<UserT | null>("dop-user", null);
+  const [user, setUser] = useState<UserT | null>(null);
   const [toast, setToast] = useState("");
   const ping = (s: string) => {
     setToast(s);
@@ -217,18 +220,27 @@ const App = () => {
           <Route
             path="/admin"
             element={
-              user?.role === "admin" ? (
+              <ServerRoleGate roles={["admin", "super_admin"]}>
                 <Admin
                   products={products}
                   setProducts={setProducts}
                   ping={ping}
                 />
-              ) : (
-                <Auth setUser={setUser} ping={ping} admin />
-              )
+              </ServerRoleGate>
             }
           />
           <Route path="/about" element={<About />} />
+          <Route path="/wallet" element={<PreProductionWallet />} />
+          <Route
+            path="/operations"
+            element={
+              <ServerRoleGate
+                roles={["compliance", "finance", "admin", "super_admin"]}
+              >
+                <ComplianceOperations />
+              </ServerRoleGate>
+            }
+          />
           <Route
             path="*"
             element={<MasterHome products={products} add={() => {}} />}
@@ -274,7 +286,6 @@ function Shell({
           <NavLink to="/">Exchange</NavLink>
           <NavLink to="/shop">Catalog</NavLink>
           <NavLink to="/about">Company</NavLink>
-          {user?.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
           <NavLink to={user ? "/account" : "/auth"}>
             <User /> {user ? user.name.split(" ")[0] : "Sign in"}
           </NavLink>
@@ -309,11 +320,11 @@ function Shell({
         <div>
           <b>CONTACT</b>
           <a href="mailto:procurement@example.com">Procurement inquiry</a>
-          <span>Illustrative demo experience</span>
+          <span>Pre-production interface</span>
           <span>No real payment capture</span>
         </div>
         <p className="legal">
-          © 2026 DOP Global. Demo website — catalog, credentials and
+          © 2026 DOP Global. Pre-production website — catalog, credentials and
           transactions are local illustrative data.
         </p>
       </footer>
@@ -341,8 +352,16 @@ function NewShell({
   };
   useLayoutEffect(() => {
     if (!open) return;
-    const focusTimer = window.setTimeout(() => closeRef.current?.focus(), 320);
-    return () => window.clearTimeout(focusTimer);
+    const focusClose = () => closeRef.current?.focus({ preventScroll: true });
+    focusClose();
+    const focusFrame = window.requestAnimationFrame(focusClose);
+    const focusRetry = window.setTimeout(() => {
+      if (document.activeElement !== closeRef.current) focusClose();
+    }, 50);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.clearTimeout(focusRetry);
+    };
   }, [open]);
   useEffect(() => {
     document.body.classList.toggle("drawer-open", open);
@@ -445,11 +464,12 @@ function NewShell({
             <NavLink to="/cart">
               Quote Basket ({cart}) <span>06</span>
             </NavLink>
-            {user?.role === "admin" && (
-              <NavLink to="/admin">
-                Admin <span>07</span>
-              </NavLink>
-            )}
+            <NavLink to="/wallet">
+              Wallet readiness <span>07</span>
+            </NavLink>
+            <NavLink to="/operations">
+              Compliance operations <span>08</span>
+            </NavLink>
           </nav>
           {user && (
             <button
@@ -485,11 +505,11 @@ function NewShell({
         <div>
           <b>CONTACT</b>
           <span>Business contact details pending verification</span>
-          <span>Illustrative demo experience</span>
+          <span>Awaiting provider and licence verification</span>
           <span>No real payment capture</span>
         </div>
         <p className="legal">
-          © 2026 DOP Global. Demonstration website — catalog, credentials,
+          © 2026 DOP Global. Pre-production website — catalog, credentials,
           availability and transactions are illustrative local data. Market
           information may be delayed and is provided by TradingView.
         </p>
@@ -499,9 +519,11 @@ function NewShell({
 }
 function MarketPulse() {
   const widgetRef = useRef<HTMLDivElement>(null);
-  const [adapterQuotes, setAdapterQuotes] = useState<
-    Array<{ symbol: string; price: string; change?: string }> | null
-  >(null);
+  const [adapterQuotes, setAdapterQuotes] = useState<Array<{
+    symbol: string;
+    price: string;
+    change?: string;
+  }> | null>(null);
   const [unavailable, setUnavailable] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
@@ -523,11 +545,17 @@ function MarketPulse() {
             (q: { symbol?: string; price?: string | number }) =>
               q?.symbol && allowed.has(q.symbol) && q.price !== undefined,
           )
-          .map((q: { symbol: string; price: string | number; change?: string }) => ({
-            symbol: q.symbol,
-            price: String(q.price),
-            change: q.change ? String(q.change) : undefined,
-          }));
+          .map(
+            (q: {
+              symbol: string;
+              price: string | number;
+              change?: string;
+            }) => ({
+              symbol: q.symbol,
+              price: String(q.price),
+              change: q.change ? String(q.change) : undefined,
+            }),
+          );
         if (safe.length >= 3) setAdapterQuotes(safe);
         else throw new Error("Incomplete adapter response");
       })
@@ -541,8 +569,6 @@ function MarketPulse() {
           symbols: [
             { proName: "TVC:USOIL", title: "WTI Crude" },
             { proName: "TVC:UKOIL", title: "Brent Crude" },
-            { proName: "NYMEX:NG1!", title: "Natural Gas" },
-            { proName: "NYMEX:HO1!", title: "ULSD / Heating Oil" },
           ],
           showSymbolLogo: false,
           colorTheme: "dark",
@@ -605,6 +631,865 @@ const categories = [
   "Industrial Oils",
 ];
 const categoryIcons = [Fuel, Droplets, FlaskConical, Factory];
+type BenchmarkState = {
+  quotes: Record<string, number>;
+  usdtUsd?: number;
+  asOf?: string;
+  status?: string;
+};
+function PurposeAndBenchmarks() {
+  const [market, setMarket] = useState<BenchmarkState | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [unit, setUnit] = useState<"USD" | "USDT">("USD");
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 2200);
+    fetch("/api/market", {
+      signal: controller.signal,
+      headers: { Accept: "application/json" },
+    })
+      .then((r) => {
+        if (!r.ok || !r.headers.get("content-type")?.includes("json"))
+          throw new Error("Secure market feed unavailable");
+        return r.json();
+      })
+      .then((data) => {
+        const quotes: Record<string, number> = {};
+        for (const q of Array.isArray(data?.quotes) ? data.quotes : []) {
+          const symbol = String(q?.symbol || "");
+          const price = Number(q?.price);
+          if (
+            ["USOIL", "UKOIL", "XNGUSD", "NG", "ULSD", "HO"].includes(symbol) &&
+            Number.isFinite(price) &&
+            price > 0
+          )
+            quotes[symbol] = price;
+        }
+        const conversion = Number(data?.conversion?.usdtUsd);
+        setMarket({
+          quotes,
+          usdtUsd:
+            Number.isFinite(conversion) && conversion > 0
+              ? conversion
+              : undefined,
+          asOf: typeof data?.asOf === "string" ? data.asOf : undefined,
+          status:
+            typeof data?.status === "string" ? data.status : "May be delayed",
+        });
+      })
+      .catch(() => setMarket(null))
+      .finally(() => {
+        window.clearTimeout(timer);
+        setLoading(false);
+      });
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, []);
+  const hasConversion = Boolean(market?.usdtUsd);
+  const display = (symbol: string) => {
+    const usd = market?.quotes[symbol];
+    if (!usd) return "Unavailable";
+    const value =
+      unit === "USDT" && market?.usdtUsd ? usd / market.usdtUsd : usd;
+    return value.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits:
+        symbol === "XNGUSD" ||
+        symbol === "NG" ||
+        symbol === "ULSD" ||
+        symbol === "HO"
+          ? 3
+          : 2,
+    });
+  };
+  const marketTiles = [
+    { name: "WTI CRUDE", symbol: "USOIL", unit: "bbl" },
+    { name: "BRENT CRUDE", symbol: "UKOIL", unit: "bbl" },
+    {
+      name: "NATURAL GAS",
+      symbol: market?.quotes.XNGUSD ? "XNGUSD" : "NG",
+      unit: "MMBtu",
+    },
+    {
+      name: "ULSD / HEATING OIL",
+      symbol: market?.quotes.ULSD ? "ULSD" : "HO",
+      unit: "gal",
+    },
+  ];
+  return (
+    <section className="purposeSection">
+      <div className="purposeIntro">
+        <p className="kicker">WHAT DIGITAL CROWD OIL MEANS</p>
+        <h2>A digital workspace for physical oil procurement.</h2>
+        <p>
+          <strong>Digital Crowd Oil</strong> brings qualified B2B buyers,
+          product requirements, benchmark context and inquiry status into one
+          clear workflow. It does not represent token ownership, pooled
+          investment, profit sharing or a financial trading service.
+        </p>
+      </div>
+      <ol className="purposeFlow">
+        {[
+          [
+            Search,
+            "Discover",
+            "Explore physical fuels, lubricants and industrial oils.",
+          ],
+          [
+            Settings2,
+            "Configure",
+            "Define grade, volume, packaging, destination and incoterm.",
+          ],
+          [
+            ClipboardCheck,
+            "Qualify",
+            "Review buyer requirements and requested documentation.",
+          ],
+          [
+            Activity,
+            "Track",
+            "Follow the status of a structured RFQ in the workspace.",
+          ],
+        ].map(([I, title, copy], i) => {
+          const Icon = I as typeof Search;
+          return (
+            <li key={title as string}>
+              <span>0{i + 1}</span>
+              <Icon />
+              <div>
+                <b>{title as string}</b>
+                <p>{copy as string}</p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+      <div className="benchmarkGlass">
+        <div className="benchmarkHead">
+          <div>
+            <p className="kicker">PHYSICAL ENERGY BENCHMARK CONTEXT</p>
+            <h3>Reference market line</h3>
+          </div>
+          <div
+            className="unitToggle"
+            role="group"
+            aria-label="Benchmark display currency"
+          >
+            <button
+              className={unit === "USD" ? "active" : ""}
+              onClick={() => setUnit("USD")}
+            >
+              USD units
+            </button>
+            <button
+              className={unit === "USDT" ? "active" : ""}
+              onClick={() => hasConversion && setUnit("USDT")}
+              disabled={!hasConversion}
+              title={!hasConversion ? "Conversion unavailable" : undefined}
+            >
+              USDT estimate
+            </button>
+          </div>
+        </div>
+        <div className="benchmarkPrices fullLine">
+          {marketTiles.map((tile) => (
+            <article key={tile.name}>
+              <span>{tile.name}</span>
+              <b>{loading ? "Loading…" : display(tile.symbol)}</b>
+              <small>
+                {unit} / {tile.unit}
+              </small>
+              <em>
+                {market?.quotes[tile.symbol]
+                  ? "Secure adapter · " + (market.status || "May be delayed")
+                  : "Quote unavailable"}
+              </em>
+            </article>
+          ))}
+        </div>
+        <div className="marketState lineState">
+          <b>{market?.status || "Market data unavailable"}</b>
+          <span>
+            {market?.asOf
+              ? `Last update: ${new Date(market.asOf).toLocaleString()}`
+              : "No secure same-origin benchmark response"}
+          </span>
+        </div>
+        <p className="benchmarkNotice">
+          Benchmark data is reference context—not a binding product quotation.
+          Physical quotes depend on grade, origin, specification, volume,
+          freight, taxes, inspection and commercial terms.{" "}
+          <strong>
+            USDT display is an indicative conversion, not a payment or
+            settlement offer.
+          </strong>
+          {!hasConversion && " Conversion unavailable."}
+        </p>
+      </div>
+    </section>
+  );
+}
+function CandlestickModule() {
+  const host = useRef<HTMLDivElement>(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    if (!host.current) return;
+    const script = document.createElement("script");
+    script.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+    script.async = true;
+    script.text = JSON.stringify({
+      autosize: true,
+      symbol: "TVC:USOIL",
+      interval: "60",
+      timezone: "Etc/UTC",
+      theme: "dark",
+      style: "1",
+      locale: "en",
+      backgroundColor: "rgba(7, 17, 30, 0.12)",
+      gridColor: "rgba(86, 119, 153, 0.16)",
+      hide_top_toolbar: false,
+      hide_legend: false,
+      allow_symbol_change: false,
+      save_image: false,
+      calendar: false,
+      support_host: "https://www.tradingview.com",
+    });
+    script.onerror = () => setFailed(true);
+    host.current.appendChild(script);
+    const timer = window.setTimeout(() => {
+      if (!host.current?.querySelector("iframe")) setFailed(true);
+    }, 9000);
+    return () => window.clearTimeout(timer);
+  }, []);
+  return (
+    <section className="chartSection">
+      <div className="chartHeader">
+        <div>
+          <p className="kicker">GLASS MARKET VIEW</p>
+          <h2>WTI candlestick context.</h2>
+          <p>
+            Provider data may be delayed or reflect a closed market. This chart
+            supports procurement context only; it is not a DOP execution or
+            investment interface.
+          </p>
+        </div>
+        <span>WTI · USD / bbl</span>
+      </div>
+      <div className="chartGlass">
+        {failed ? (
+          <div className="chartFallback">
+            <Activity />
+            <h3>Candlestick data unavailable</h3>
+            <p>Use the provider pages for current benchmark context.</p>
+            <div>
+              <a
+                href="https://www.tradingview.com/symbols/TVC-USOIL/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                View WTI on TradingView
+              </a>
+              <a
+                href="https://www.tradingview.com/symbols/TVC-UKOIL/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                View Brent on TradingView
+              </a>
+            </div>
+          </div>
+        ) : (
+          <div ref={host} className="tradingview-widget-container chartHost" />
+        )}
+      </div>
+      <a
+        className="chartAttribution"
+        href="https://www.tradingview.com/"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Candlestick chart by TradingView
+      </a>
+    </section>
+  );
+}
+function PhysicalTradeWorkflow() {
+  const [mode, setMode] = useState<"buy" | "sell">("buy");
+  const [submitted, setSubmitted] = useState<null | "buy" | "sell">(null);
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(mode);
+  };
+  return (
+    <section className="tradeWorkflow">
+      <div className="tradeIntro">
+        <p className="kicker">PHYSICAL CRUDE OIL · BUY & SELL WORKFLOW</p>
+        <h2>
+          Structured inquiry.
+          <br />
+          Verified counterparties.
+          <br />
+          Signed contract.
+        </h2>
+        <p>
+          This workspace stages physical product inquiries. It is not a token
+          exchange, spot brokerage, investment product or instant
+          trade-execution venue.
+        </p>
+        <div
+          className="tradeTabs"
+          role="tablist"
+          aria-label="Physical crude workflow"
+        >
+          <button
+            role="tab"
+            aria-selected={mode === "buy"}
+            className={mode === "buy" ? "active" : ""}
+            onClick={() => {
+              setMode("buy");
+              setSubmitted(null);
+            }}
+          >
+            Request to Buy
+          </button>
+          <button
+            role="tab"
+            aria-selected={mode === "sell"}
+            className={mode === "sell" ? "active" : ""}
+            onClick={() => {
+              setMode("sell");
+              setSubmitted(null);
+            }}
+          >
+            Offer to Sell
+          </button>
+        </div>
+      </div>
+      <div className="tradePanel">
+        {submitted ? (
+          <div className="tradeConfirmation" aria-live="polite">
+            <CheckCircle2 />
+            <p className="kicker">LOCAL DEMO STAGED</p>
+            <h3>
+              {submitted === "buy"
+                ? "Buy request prepared for qualification."
+                : "Supplier offer prepared for verification."}
+            </h3>
+            <p>
+              {submitted === "buy"
+                ? "No ownership transferred and no benchmark price was locked. A commercial team would next qualify the buyer and requirement before any indicative offer."
+                : "Nothing was publicly listed and no sale occurred. A production workflow would verify the supplier and product evidence before any buyer matching."}
+            </p>
+            <button className="secondary" onClick={() => setSubmitted(null)}>
+              Prepare another {submitted === "buy" ? "request" : "offer"}
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={submit}>
+            <div className="panelTitle">
+              <span>{mode === "buy" ? "BUY-SIDE RFQ" : "SUPPLIER OFFER"}</span>
+              <b>
+                {mode === "sell"
+                  ? "Supplier verification required"
+                  : "Buyer qualification required"}
+              </b>
+            </div>
+            {mode === "buy" ? (
+              <>
+                <label className="field">
+                  BUYER COMPANY *
+                  <input required placeholder="Legal company name" />
+                </label>
+                <div className="formPair">
+                  <label className="field">
+                    BENCHMARK REFERENCE
+                    <select>
+                      <option>WTI · reference only</option>
+                      <option>Brent · reference only</option>
+                      <option>No benchmark reference</option>
+                    </select>
+                  </label>
+                  <label className="field">
+                    GRADE / SPECIFICATION *
+                    <input
+                      required
+                      placeholder="e.g. crude grade or fuel specification"
+                    />
+                  </label>
+                </div>
+                <div className="formPair">
+                  <label className="field">
+                    QUANTITY *
+                    <input
+                      required
+                      placeholder="e.g. 50,000 bbl or 10,000 MT"
+                    />
+                  </label>
+                  <label className="field">
+                    FORMAT
+                    <select>
+                      <option>Bulk cargo</option>
+                      <option>Flexitank / ISO tank</option>
+                      <option>Drum / IBC</option>
+                    </select>
+                  </label>
+                </div>
+                <div className="formPair">
+                  <label className="field">
+                    DELIVERY DESTINATION *
+                    <input required placeholder="Port and country" />
+                  </label>
+                  <label className="field">
+                    INCOTERM
+                    <select>
+                      <option>FOB · named loading port</option>
+                      <option>CIF · named destination port</option>
+                      <option>Other · subject to review</option>
+                    </select>
+                  </label>
+                </div>
+              </>
+            ) : (
+              <>
+                <label className="field">
+                  SUPPLIER LEGAL IDENTITY *
+                  <input required placeholder="Registered entity name" />
+                </label>
+                <div className="formPair">
+                  <label className="field">
+                    PRODUCT / GRADE *
+                    <input required placeholder="Physical product and grade" />
+                  </label>
+                  <label className="field">
+                    ORIGIN *
+                    <input required placeholder="Country / loading origin" />
+                  </label>
+                </div>
+                <div className="formPair">
+                  <label className="field">
+                    AVAILABLE QUANTITY *
+                    <input required placeholder="Volume and unit" />
+                  </label>
+                  <label className="field">
+                    DELIVERY TERMS
+                    <select>
+                      <option>FOB · named loading port</option>
+                      <option>CIF · named destination port</option>
+                      <option>Other · subject to review</option>
+                    </select>
+                  </label>
+                </div>
+                <label className="documentCheck">
+                  <input required type="checkbox" />
+                  <span>
+                    I can provide evidence of product rights/title, product
+                    quality/specification, origin and company authority for
+                    review.
+                  </span>
+                </label>
+              </>
+            )}
+            <button className="primary wide">
+              {mode === "buy"
+                ? "Stage physical Buy RFQ"
+                : "Stage supplier Sell offer"}
+              <ArrowRight />
+            </button>
+            <p className="notice">
+              Local demonstration only. No data is transmitted, no public
+              listing is created, no price is locked and no transaction occurs.
+            </p>
+          </form>
+        )}
+      </div>
+      <div className="whenSell">
+        <p className="kicker">WHEN CAN PHYSICAL PRODUCT BE SOLD?</p>
+        <h3>Only after evidence and authority are established.</h3>
+        <p>
+          The seller must be verified and legally authorised, control or hold
+          title/contractual rights to the physical product, provide required
+          product, quality and origin documentation, accept commercial terms,
+          and satisfy applicable jurisdiction, shipping and compliance
+          requirements. This is general workflow information—not
+          jurisdiction-specific legal assurance.
+        </p>
+      </div>
+      <div className="outcomeCards">
+        <article>
+          <span>BUY REQUEST OUTCOME</span>
+          <h3>What happens after a Buy request?</h3>
+          <ol>
+            <li>Buyer qualification</li>
+            <li>Indicative offer</li>
+            <li>Document & specification review</li>
+            <li>Signed commercial contract</li>
+            <li>Logistics coordination</li>
+          </ol>
+          <p>No guaranteed offer, delivery or benchmark-price lock.</p>
+        </article>
+        <article>
+          <span>SELL OFFER OUTCOME</span>
+          <h3>What happens after a Sell offer?</h3>
+          <ol>
+            <li>Supplier verification</li>
+            <li>Product evidence review</li>
+            <li>Potential buyer matching</li>
+            <li>Commercial negotiation</li>
+            <li>Signed commercial contract</li>
+          </ol>
+          <p>No guaranteed match, sale, delivery or profit.</p>
+        </article>
+      </div>
+      <p className="regulatoryBoundary">
+        <ShieldCheck />
+        <span>
+          <b>Regulatory boundary.</b> Tokenised or virtual-asset buying,
+          exchange or issuance is not offered by this website. Such activity
+          would require a separately authorised regulated service. DOP does not
+          claim that licence here, and this demo offers no wallet, deposits,
+          USDT settlement, returns or resale liquidity.
+        </span>
+      </p>
+    </section>
+  );
+}
+type ReadinessPayload = {
+  mode: string;
+  transactionReady: boolean;
+  gates: Record<string, boolean>;
+};
+function ServerRoleGate({
+  roles,
+  children,
+}: {
+  roles: string[];
+  children: React.ReactNode;
+}) {
+  const [state, setState] = useState<"checking" | "denied" | "allowed">(
+    "checking",
+  );
+  useEffect(() => {
+    const c = new AbortController();
+    fetch("/api/v1/session", {
+      credentials: "include",
+      signal: c.signal,
+      headers: { Accept: "application/json" },
+    })
+      .then(async (r) => {
+        if (!r.ok) throw new Error("No authoritative session");
+        const data = (await r.json()) as {
+          authenticated?: boolean;
+          roles?: string[];
+        };
+        setState(
+          data.authenticated && data.roles?.some((role) => roles.includes(role))
+            ? "allowed"
+            : "denied",
+        );
+      })
+      .catch(() => setState("denied"));
+    return () => c.abort();
+  }, [roles.join("|")]);
+  if (state === "allowed") return <>{children}</>;
+  return (
+    <section className="platformPage accessDenied">
+      <ShieldCheck />
+      <p className="kicker">SERVER-AUTHORIZED ACCESS REQUIRED</p>
+      <h1>
+        {state === "checking"
+          ? "Checking secure session…"
+          : "Access fail-closed."}
+      </h1>
+      <p>
+        Admin and compliance operations require an authenticated server session
+        with an authoritative role. Browser storage and development preview
+        credentials cannot grant access.
+      </p>
+      <div className="readinessBanner">
+        <Activity />
+        <div>
+          <b>
+            {state === "checking"
+              ? "Session verification in progress"
+              : "Secure auth provider is unavailable or permission was denied"}
+          </b>
+          <p>
+            No administrative, financial, KYC, ledger or approval command has
+            been unlocked.
+          </p>
+        </div>
+      </div>
+      <div className="gateMatrix deniedGates">
+        <h2>Required transaction gates</h2>
+        <p className="gateAggregate">Aggregate: Fail closed</p>
+        {["database", "migrations", "oracle", "conversion", "kyc", "sanctions", "custody", "hsm_kms", "licence_verification", "fees", "inventory_attestation", "reconciliation"].map((gate) => (
+          <div key={gate}>
+            <span>{gate.replaceAll("_", " ")}</span>
+            <b className="gateBlocked">Unknown · API unavailable</b>
+          </div>
+        ))}
+      </div>
+      <Link className="secondary" to="/">
+        Return to public site
+      </Link>
+    </section>
+  );
+}
+function usePlatformReadiness() {
+  const [state, setState] = useState<{
+    loading: boolean;
+    data?: ReadinessPayload;
+    error?: string;
+  }>({ loading: true });
+  useEffect(() => {
+    const c = new AbortController();
+    const t = window.setTimeout(() => c.abort(), 2500);
+    fetch("/api/v1/status", {
+      signal: c.signal,
+      headers: { Accept: "application/json" },
+    })
+      .then((r) => {
+        if (!r.ok || !r.headers.get("content-type")?.includes("json"))
+          throw new Error("API unavailable");
+        return r.json();
+      })
+      .then((data) => setState({ loading: false, data }))
+      .catch(() =>
+        setState({
+          loading: false,
+          error: "Secure platform API is not connected",
+        }),
+      )
+      .finally(() => window.clearTimeout(t));
+    return () => {
+      c.abort();
+      window.clearTimeout(t);
+    };
+  }, []);
+  return state;
+}
+function PreProductionWallet() {
+  const status = usePlatformReadiness();
+  const gates = status.data?.gates || {};
+  return (
+    <section className="platformPage">
+      <header className="platformTitle">
+        <div>
+          <p className="kicker">BARREL-DENOMINATED ACCOUNT</p>
+          <h1>Wallet readiness.</h1>
+          <p>
+            Backend-authoritative balances and transaction history. Browser
+            storage is never used as a money, KYC, role or ledger source.
+          </p>
+        </div>
+        <span className="preprodBadge">
+          PRE-PRODUCTION · TRANSACTIONS BLOCKED
+        </span>
+      </header>
+      <div className="readinessBanner">
+        <ShieldCheck />
+        <div>
+          <b>
+            {status.loading
+              ? "Checking secure API…"
+              : status.data?.transactionReady
+                ? "Transaction gates verified"
+                : "Awaiting provider and licence verification"}
+          </b>
+          <p>
+            {status.error ||
+              "Process health does not mean transaction readiness. Every compliance, custody, pricing, fee and backing gate must pass."}
+          </p>
+        </div>
+      </div>
+      <div className="walletBalances">
+        {[
+          ["USD", "Available / reserved"],
+          ["USDT", "Available / reserved"],
+          ["DCO_BBL", "Barrel units / reserved"],
+        ].map(([asset, label]) => (
+          <article key={asset}>
+            <span>{asset}</span>
+            <b>Unavailable</b>
+            <small>{label}</small>
+            <em>No authoritative ledger response</em>
+          </article>
+        ))}
+      </div>
+      <div className="walletGrid">
+        <article>
+          <h2>Holdings ledger</h2>
+          <div className="platformEmpty">
+            <Activity />
+            <b>No authoritative ledger connected</b>
+            <p>
+              Posted entries will appear only from the server double-entry
+              ledger.
+            </p>
+          </div>
+        </article>
+        <article>
+          <h2>Account & backing</h2>
+          <dl className="statusList">
+            <div>
+              <dt>KYC status</dt>
+              <dd>
+                {gates.kyc
+                  ? "Configured · server review required"
+                  : "Not configured"}
+              </dd>
+            </div>
+            <div>
+              <dt>Custody</dt>
+              <dd>
+                {gates.custody ? "Provider configured" : "Not configured"}
+              </dd>
+            </div>
+            <div>
+              <dt>Oil attestation</dt>
+              <dd>
+                {gates.inventory_attestation
+                  ? "Provider configured · verification pending"
+                  : "Not configured"}
+              </dd>
+            </div>
+            <div>
+              <dt>Licence evidence</dt>
+              <dd>
+                {gates.licence_verification
+                  ? "Gate marked verified"
+                  : "Awaiting evidence and verification"}
+              </dd>
+            </div>
+          </dl>
+        </article>
+        <article className="transactions">
+          <h2>Transaction history</h2>
+          <div className="platformEmpty">
+            <FileCheck2 />
+            <b>No posted transactions</b>
+            <p>
+              Previews do not create ownership, settlement, custody movement or
+              ledger entries.
+            </p>
+          </div>
+        </article>
+        <article>
+          <h2>Financial commands</h2>
+          <p>
+            Buy, sell, transfer and withdrawal confirmation remain disabled
+            until all server gates pass.
+          </p>
+          <button disabled className="primary wide">
+            Confirmation blocked
+          </button>
+          <small className="blockedCopy">
+            Missing fee schedules and provider readiness are returned as
+            PRECONDITION_REQUIRED by the API.
+          </small>
+        </article>
+      </div>
+    </section>
+  );
+}
+function ComplianceOperations() {
+  const status = usePlatformReadiness();
+  const gates = status.data?.gates || {};
+  const canonicalGates = [
+    "database",
+    "migrations",
+    "oracle",
+    "conversion",
+    "kyc",
+    "sanctions",
+    "custody",
+    "hsm_kms",
+    "licence_verification",
+    "fees",
+    "inventory_attestation",
+    "reconciliation",
+  ];
+  const ops = [
+    ["KYC queue", gates.kyc, "Provider review queue"],
+    ["Trade approvals", false, "Maker/checker decisions"],
+    [
+      "Issuance & backing",
+      gates.inventory_attestation,
+      "Attestation plus dual approval",
+    ],
+    ["Withdrawals", gates.custody, "Risk, limits and custody instruction"],
+    ["Reconciliation", gates.reconciliation, "Internal vs provider controls"],
+    ["Audit chain", Boolean(status.data), "Hash-chain verification"],
+  ];
+  return (
+    <section className="platformPage operationsPage">
+      <header className="platformTitle">
+        <div>
+          <p className="kicker">COMPLIANCE & FINANCE CONTROL PLANE</p>
+          <h1>Operations readiness.</h1>
+          <p>
+            Server authorization is authoritative. This read-only pre-production
+            surface does not grant a role or execute an approval.
+          </p>
+        </div>
+        <span className="preprodBadge">NO LIVE OPERATIONS</span>
+      </header>
+      <div className="opsGrid">
+        {ops.map(([name, ready, copy], i) => (
+          <article key={String(name)}>
+            <span>0{i + 1}</span>
+            <ShieldCheck />
+            <h2>{String(name)}</h2>
+            <p>{String(copy)}</p>
+            <b className={ready ? "gateReady" : "gateBlocked"}>
+              {ready ? "Integration configured" : "Blocked / not configured"}
+            </b>
+            <button disabled>Open when server-authorized</button>
+          </article>
+        ))}
+      </div>
+      <section className="makerChecker">
+        <div>
+          <p className="kicker">MAKER / CHECKER SEPARATION</p>
+          <h2>Creation is not approval.</h2>
+        </div>
+        <p>
+          A maker may prepare a financial command but cannot approve it. A
+          separately server-authorized checker must review the command, its
+          evidence and current gates. Posted ledger entries remain append-only;
+          corrections use compensating reversals.
+        </p>
+      </section>
+      <div className="gateMatrix">
+        <h2>Transaction readiness gates</h2>
+        <p className="gateAggregate">
+          Aggregate: {status.data?.transactionReady ? "Ready" : "Fail closed"}
+        </p>
+        {canonicalGates.map((gate) => {
+          const known = Object.prototype.hasOwnProperty.call(gates, gate);
+          const ok = known && gates[gate] === true;
+          return (
+            <div key={gate}>
+              <span>{gate.replaceAll("_", " ")}</span>
+              <b className={ok ? "gateReady" : "gateBlocked"}>
+                {status.loading
+                  ? "Checking secure API"
+                  : !known
+                    ? "Unknown · API unavailable"
+                    : ok
+                      ? "Configured"
+                      : "Blocked"}
+              </b>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 function MasterHome({
   products,
   add,
@@ -661,6 +1546,9 @@ function MasterHome({
         </div>
         <span className="heroIndex">DOP / 01</span>
       </section>
+      <PurposeAndBenchmarks />
+      <CandlestickModule />
+      <PhysicalTradeWorkflow />
       <section className="commandDeck">
         <div>
           <p className="kicker">PROCUREMENT COMMAND</p>
@@ -788,13 +1676,34 @@ function MasterHome({
             alt="Glass fractional distillation column visualization"
             loading="lazy"
           />
-          <div className="fractionLabels" aria-label="Indicative crude oil fractions">
-            <span style={{ top: "8%" }}><b>Refinery gases</b><small>below ~20°C</small></span>
-            <span style={{ top: "23%" }}><b>Gasoline / naphtha</b><small>~40–200°C</small></span>
-            <span style={{ top: "40%" }}><b>Kerosene / jet range</b><small>~150–275°C</small></span>
-            <span style={{ top: "57%" }}><b>Diesel / gasoil</b><small>~250–350°C</small></span>
-            <span style={{ top: "73%" }}><b>Lubricating oils & waxes</b><small>~300–400°C</small></span>
-            <span style={{ top: "88%" }}><b>Heavy residue / bitumen</b><small>typically above ~350°C</small></span>
+          <div
+            className="fractionLabels"
+            aria-label="Indicative crude oil fractions"
+          >
+            <span style={{ top: "8%" }}>
+              <b>Refinery gases</b>
+              <small>below ~20°C</small>
+            </span>
+            <span style={{ top: "23%" }}>
+              <b>Gasoline / naphtha</b>
+              <small>~40–200°C</small>
+            </span>
+            <span style={{ top: "40%" }}>
+              <b>Kerosene / jet range</b>
+              <small>~150–275°C</small>
+            </span>
+            <span style={{ top: "57%" }}>
+              <b>Diesel / gasoil</b>
+              <small>~250–350°C</small>
+            </span>
+            <span style={{ top: "73%" }}>
+              <b>Lubricating oils & waxes</b>
+              <small>~300–400°C</small>
+            </span>
+            <span style={{ top: "88%" }}>
+              <b>Heavy residue / bitumen</b>
+              <small>typically above ~350°C</small>
+            </span>
           </div>
         </div>
       </section>
@@ -1410,17 +2319,15 @@ function Basket({
 function Auth({
   setUser,
   ping,
-  admin = false,
 }: {
   setUser: (u: UserT) => void;
   ping: (s: string) => void;
-  admin?: boolean;
 }) {
   const nav = useNavigate();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [f, setF] = useState({
     name: "",
-    email: admin ? "admin@dop.demo" : "buyer@dop.demo",
+    email: "buyer@dop.demo",
     password: "Demo123!",
   });
   const submit = (e: React.FormEvent) => {
@@ -1429,15 +2336,12 @@ function Auth({
       ping("Use a valid email and 8+ character password");
       return;
     }
-    const role =
-      f.email.toLowerCase() === "admin@dop.demo" ? "admin" : "customer";
     setUser({
-      name: f.name || (role === "admin" ? "DOP Admin" : "Demo Buyer"),
+      name: f.name || "Development Preview User",
       email: f.email,
-      role,
     });
-    ping("Demo session started");
-    nav(role === "admin" ? "/admin" : "/account");
+    ping("Non-authoritative UI preview started");
+    nav("/account");
   };
   return (
     <section className="auth">
@@ -1449,12 +2353,12 @@ function Auth({
           <em>refined.</em>
         </h2>
         <p>
-          Local demonstration authentication for exploring customer and admin
-          workflows.
+          Non-authoritative development preview. This does not create a server
+          session, role, KYC status or financial authority.
         </p>
       </div>
       <form onSubmit={submit}>
-        <p className="eyebrow">{admin ? "ADMIN ACCESS" : "MEMBER EXCHANGE"}</p>
+        <p className="eyebrow">DEVELOPMENT UI PREVIEW</p>
         <h1>{mode === "login" ? "Welcome back." : "Create your profile."}</h1>
         {mode === "register" && (
           <label className="field">
@@ -1494,11 +2398,11 @@ function Auth({
             : "Already registered? Sign in"}
         </button>
         <div className="demo">
-          <b>Demo accounts</b>
+          <b>Non-authoritative preview account</b>
           <span>Customer: buyer@dop.demo / Demo123!</span>
-          <span>Admin: admin@dop.demo / Demo123!</span>
           <small>
-            Credentials are illustrative and not production security.
+            This browser-only preview cannot unlock admin, compliance, money,
+            KYC or ledger commands.
           </small>
         </div>
       </form>

@@ -1,0 +1,4 @@
+import { Pool,type PoolClient } from "pg";
+export const createPool=(connectionString:string)=>new Pool({connectionString,max:10,statement_timeout:5000,query_timeout:6000,application_name:"dop-preproduction"});
+export async function serializableCommand<T>(pool:Pool,lockKey:string,work:(client:PoolClient)=>Promise<T>){const client=await pool.connect();try{await client.query("BEGIN ISOLATION LEVEL SERIALIZABLE");await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",[lockKey]);const result=await work(client);await client.query("COMMIT");return result}catch(error){await client.query("ROLLBACK");throw error}finally{client.release()}}
+export async function migrationStatus(pool:Pool){const result=await pool.query<{exists:boolean}>("SELECT to_regclass('public.ledger_transactions') IS NOT NULL AS exists");return result.rows[0]?.exists===true}

@@ -1,0 +1,4 @@
+import test from "node:test";import assert from "node:assert/strict";import { loadConfig,readiness } from "../src/config.js";import { previewIntent } from "../src/workflow.js";
+test("default config is fail closed",()=>{const c=loadConfig({NODE_ENV:"test"});assert.equal(readiness(c).transactionReady,false);const r=previewIntent(c,{side:"buy",asset:"DCO_BBL",quantityMinor:"100"});assert.equal(r.code,"PRECONDITION_REQUIRED")});
+test("production refuses missing providers",()=>assert.throws(()=>loadConfig({NODE_ENV:"production"}),/startup refused/));
+test("floating or negative quantities rejected",()=>{const c=loadConfig({NODE_ENV:"test"});assert.equal(previewIntent(c,{side:"sell",asset:"DCO_BBL",quantityMinor:"1.5"}).code,"VALIDATION_ERROR");assert.equal(previewIntent(c,{side:"sell",asset:"DCO_BBL",quantityMinor:"-1"}).code,"VALIDATION_ERROR")});
