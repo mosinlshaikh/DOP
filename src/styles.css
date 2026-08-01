@@ -1426,6 +1426,263 @@ footer b {
     right: 15px;
   }
 }
+
+/* Final collision-safe allocation for the 3D category collection. */
+.categoryStack > a {
+  grid-template-columns: 104px minmax(0, 1fr) 30px;
+  column-gap: 18px;
+}
+.categoryStack > a > .categoryObject {
+  width: 92px;
+  max-width: 92px;
+  justify-self: start;
+  overflow: visible;
+}
+.categoryStack > a::after { left: 0; }
+.categoryStack > a > div {
+  min-width: 0;
+  position: relative;
+  z-index: 2;
+}
+.categoryStack > a > svg:last-child {
+  display: block;
+  grid-column: 3;
+  width: 18px;
+  height: 18px;
+  justify-self: end;
+}
+.categoryObject.industrialOil {
+  left: -3px;
+}
+@media (max-width: 900px) {
+  .categoryStack > a {
+    grid-template-columns: 104px minmax(0, 1fr) 22px;
+    column-gap: 12px;
+  }
+  .categoryStack > a > svg:last-child {
+    display: block;
+    grid-column: 3;
+    width: 18px;
+    height: 18px;
+  }
+}
+@media (max-width: 620px) {
+  .categoryStack > a {
+    grid-template-columns: 92px minmax(0, 1fr) 20px;
+    column-gap: 8px;
+    padding-right: 2px;
+  }
+  .categoryStack > a > .categoryObject {
+    width: 92px;
+    max-width: 92px;
+  }
+  .categoryStack > a > svg:last-child {
+    display: block;
+    width: 17px;
+    height: 17px;
+  }
+}
+@media (max-width: 400px) {
+  .categoryStack > a {
+    grid-template-columns: 92px minmax(0, 1fr) 18px;
+    column-gap: 6px;
+  }
+  .glassMark::before {
+    inset: 4px -2px -3px 4px;
+    border-color: #b97a173d;
+    box-shadow: 3px 4px 0 #020509, 5px 7px 14px #000a;
+  }
+  .logoDepth {
+    border-color: #f1d17b1c;
+    box-shadow: inset 0 -6px 12px #0007;
+  }
+  .glassMark::after { border-color: #f1d17b18; }
+}
+
+/* 3D supply collection + dimensional masthead emblem */
+.glassMark {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 146px;
+  height: 100px;
+  padding: 9px;
+  border: 1px solid #d7a84d66;
+  background:
+    linear-gradient(145deg, #ffffff17, transparent 36%),
+    radial-gradient(circle at 50% 42%, #174f7166, transparent 61%),
+    linear-gradient(135deg, #07101bd9, #02070df2);
+  box-shadow:
+    inset 0 1px 0 #fff5,
+    inset 0 -8px 18px #000b,
+    0 0 0 1px #07101b,
+    0 18px 38px #000b,
+    0 0 28px #58cfe71a;
+  transform: perspective(500px) rotateX(2deg);
+  transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+}
+.glassMark::before,
+.glassMark::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+.glassMark::before {
+  z-index: -1;
+  inset: 5px -4px -5px 5px;
+  border: 1px solid #b97a1766;
+  background: #030910;
+  box-shadow: 5px 6px 0 #020509, 8px 10px 20px #000b;
+}
+.glassMark::after {
+  z-index: 4;
+  inset: 1px;
+  border: 1px solid #f1d17b26;
+  box-shadow: inset 8px 0 15px #58cfe710, inset -6px 0 14px #d7a84d16;
+}
+.glassMark img {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 0 #7b4c14) drop-shadow(0 9px 12px #000e) brightness(1.1) contrast(1.08);
+}
+.logoHalo,
+.logoDepth,
+.logoSweep { position: absolute; inset: 0; pointer-events: none; }
+.logoHalo {
+  z-index: 1;
+  inset: 14% 8%;
+  background: radial-gradient(ellipse, #58cfe734 0, #d7a84d20 37%, transparent 70%);
+  filter: blur(8px);
+}
+.logoDepth {
+  z-index: 2;
+  inset: 8px;
+  border: 1px solid #f1d17b33;
+  background: linear-gradient(110deg, #07101b80, transparent 48%, #b97a1715);
+  box-shadow: inset 0 -10px 18px #0008;
+}
+.logoSweep {
+  z-index: 5;
+  inset: -45% auto -45% -38%;
+  width: 24%;
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, transparent, #fff9, #f1d17b55, transparent);
+  opacity: 0;
+  transition: left .65s cubic-bezier(.2,.7,.2,1), opacity .18s;
+}
+.glassMark:hover,
+.glassMark:focus-visible {
+  transform: perspective(500px) rotateX(0) translateY(-2px);
+  border-color: #f1d17ba8;
+  box-shadow: inset 0 1px #fff7, inset 0 -8px 18px #000b, 0 21px 44px #000c, 0 0 36px #58cfe72b;
+}
+.glassMark:hover .logoSweep,
+.glassMark:focus-visible .logoSweep { left: 116%; opacity: .75; }
+
+.categoryStack > a {
+  position: relative;
+  grid-template-columns: 45px 104px 1fr 30px;
+  min-height: 164px;
+  overflow: hidden;
+  background: radial-gradient(circle at 20% 50%, #12395818, transparent 28%);
+}
+.categoryStack > a::after {
+  content: "";
+  position: absolute;
+  left: 59px;
+  bottom: 20px;
+  width: 92px;
+  height: 11px;
+  border-radius: 50%;
+  background: #000b;
+  filter: blur(7px);
+  pointer-events: none;
+}
+.categoryObject {
+  position: relative;
+  z-index: 1;
+  width: 92px;
+  height: 106px;
+  display: block;
+  perspective: 360px;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 13px 9px #000b);
+  transition: transform .32s ease, filter .32s ease;
+}
+.categoryStack > a:hover .categoryObject,
+.categoryStack > a:focus-visible .categoryObject {
+  transform: translateY(-5px) rotateY(-5deg);
+  filter: drop-shadow(0 18px 12px #000d) brightness(1.08);
+}
+.objectGlow {
+  position: absolute;
+  inset: 24% 6% 6%;
+  background: radial-gradient(circle, #58cfe730, #d7a84d14 42%, transparent 72%);
+  filter: blur(9px);
+}
+.objectBase {
+  position: absolute;
+  left: 8px; right: 8px; bottom: 3px; height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(#f1d17b, #6d410c 45%, #02070d 52%);
+  border: 1px solid #e9c46a80;
+  box-shadow: inset 0 2px 2px #fff6, 0 5px 9px #000c;
+}
+/* Refined fuel tank */
+.tankBody { position:absolute; left:19px; top:25px; width:56px; height:68px; border-radius:12px 12px 15px 15px / 8px 8px 13px 13px; border:1px solid #d7a84d99; background:linear-gradient(90deg,#02070d 3%,#12304d 22%,#07101b 51%,#235074 72%,#02070d 98%); box-shadow:inset 7px 0 9px #58cfe718,inset -7px 0 9px #000,0 0 0 2px #02070d; }
+.tankBody::before { content:""; position:absolute; inset:8px 5px auto; height:24px; background:linear-gradient(110deg,#ffffff18,transparent 45%); border-radius:50%; }
+.tankTop { position:absolute; z-index:2; left:20px; top:19px; width:54px; height:15px; border-radius:50%; border:2px solid #d7a84d; background:radial-gradient(ellipse at 42% 30%,#58cfe73d,#07101b 48%,#02070d 75%); box-shadow:inset 0 2px 2px #fff5; }
+.tankBand { position:absolute; left:-2px; width:58px; height:5px; background:linear-gradient(#f1d17b,#8d5813 48%,#e5ba61); box-shadow:0 2px 4px #0009; }
+.tankBand.one { top:22px; }.tankBand.two { top:49px; }
+.tankDrop { position:absolute; z-index:3; left:39px; top:47px; width:16px; height:21px; border-radius:60% 40% 62% 38% / 68% 48% 52% 32%; transform:rotate(45deg); background:linear-gradient(135deg,#f1d17b,#8c540e 52%,#2a1602); box-shadow:inset 3px 2px 3px #fff6,0 2px 4px #000; }
+/* Lubricant canister */
+.canBody { position:absolute; left:20px; top:34px; width:54px; height:59px; border:1px solid #dfb85c; border-radius:7px 7px 12px 12px; background:linear-gradient(90deg,#06111d,#164c78 24%,#08243d 51%,#2477a0 70%,#03090f); box-shadow:inset 5px 0 8px #58cfe722,inset -7px 0 8px #000; }
+.canShoulder { position:absolute; left:20px; top:26px; width:54px; height:20px; clip-path:polygon(12% 35%,31% 0,72% 0,89% 35%,100% 100%,0 100%); background:linear-gradient(90deg,#06101b,#326d92,#06101b); border-bottom:2px solid #d7a84d; }
+.canNeck { position:absolute; z-index:2; left:36px; top:17px; width:25px; height:15px; border:2px solid #b97a17; border-radius:3px 3px 0 0; background:linear-gradient(90deg,#06101b,#25587a,#02070d); }
+.canLabel { position:absolute; left:7px; right:7px; top:15px; height:25px; transform:skewY(-4deg); border:1px solid #f1d17b88; background:linear-gradient(135deg,#bd7a18,#f1d17b 45%,#7c4b0c); box-shadow:inset 0 1px #fff8; }
+.canLabel::after { content:"DOP"; display:grid; place-items:center; height:100%; color:#06101b; font:800 10px Georgia,serif; letter-spacing:.12em; }
+.viscousDrop { position:absolute; z-index:3; right:7px; bottom:15px; width:14px; height:19px; border-radius:70% 30% 60% 40%; transform:rotate(42deg); background:linear-gradient(135deg,#f7da88,#9c610d); box-shadow:inset 3px 2px #fff7,0 3px 5px #000; }
+/* Petrochemical glass vessel */
+.flaskNeck { position:absolute; z-index:2; left:37px; top:14px; width:22px; height:34px; border:3px solid #d7a84d; border-bottom:0; background:linear-gradient(90deg,#58cfe711,#d7f9ff35,#07101b55); box-shadow:inset 4px 0 5px #58cfe72e; }
+.flaskVessel { position:absolute; left:16px; top:36px; width:65px; height:60px; overflow:hidden; clip-path:polygon(31% 0,69% 0,100% 78%,88% 100%,12% 100%,0 78%); border:1px solid #58cfe7; background:linear-gradient(105deg,#ffffff13,#58cfe730 25%,#07101b88 55%,#d7a84d22); box-shadow:inset 9px 0 8px #58cfe72a,inset -6px 0 9px #0008; }
+.flaskVessel::before { content:""; position:absolute; left:11px; top:8px; width:6px; height:35px; border-radius:50%; background:#fff6; transform:rotate(20deg); filter:blur(1px); }
+.flaskLiquid { position:absolute; inset:auto 3px 3px; height:26px; clip-path:polygon(0 20%,28% 4%,66% 16%,100% 0,100% 100%,0 100%); background:linear-gradient(#d9ab4fe8,#81500de8); box-shadow:inset 0 5px 8px #f1d17b55; }
+.molecule { position:absolute; z-index:4; right:1px; top:35px; width:30px; height:34px; border:1px solid #d7a84d88; transform:rotate(25deg); }
+.molecule i { position:absolute; width:8px; height:8px; border-radius:50%; background:radial-gradient(circle at 30% 25%,#fff,#58cfe7 35%,#0b4d64); box-shadow:0 0 6px #58cfe7; }.molecule i:nth-child(1){left:-4px;top:-4px}.molecule i:nth-child(2){right:-4px;top:9px}.molecule i:nth-child(3){left:7px;bottom:-4px}
+/* Industrial hydraulic assembly */
+.gear { position:absolute; z-index:2; left:8px; top:32px; width:51px; height:51px; border-radius:50%; border:8px dotted #d7a84d; background:radial-gradient(circle,#06101b 0 18%,#a97018 20% 33%,#07101b 35% 55%,#d7a84d 57% 67%,#02070d 69%); box-shadow:inset 3px 3px 6px #fff3,0 5px 8px #000; }
+.gear i { display:none; }.gear b { position:absolute; inset:13px; border-radius:50%; border:2px solid #58cfe77a; background:#02070d; box-shadow:inset 2px 2px 4px #58cfe733; }
+.piston { position:absolute; z-index:1; right:8px; top:19px; width:25px; height:68px; border:2px solid #b97a17; border-radius:5px; background:linear-gradient(90deg,#02070d,#2a5674 44%,#07101b); transform:rotate(10deg); box-shadow:inset 4px 0 #ffffff13,4px 6px 7px #0009; }.piston i { position:absolute; left:5px; right:5px; top:-9px; height:17px; border-radius:3px; background:linear-gradient(90deg,#6c430c,#f1d17b,#6b410b); }
+.oilReservoir { position:absolute; z-index:3; right:2px; bottom:15px; width:25px; height:30px; border:1px solid #58cfe78a; border-radius:3px 3px 8px 8px; background:linear-gradient(90deg,#07101b,#174c6e,#02070d); box-shadow:inset 3px 0 #58cfe730; }.oilReservoir::after { content:""; position:absolute; left:8px; top:8px; width:9px; height:12px; border-radius:70% 30% 60% 40%; transform:rotate(42deg); background:#d7a84d; box-shadow:inset 2px 1px #fff7; }
+
+@media (max-width: 900px) {
+  .categoryStack > a { grid-template-columns: 34px 94px 1fr; min-height: 158px; }
+  .categoryObject { transform: scale(.9); transform-origin: left center; }
+  .categoryStack > a::after { left: 45px; }
+}
+@media (max-width: 620px) {
+  .glassMark { width: 74px; height: 70px; padding: 5px; }
+  .categoryStack > a { grid-template-columns: 28px 76px minmax(0,1fr); gap: 8px; min-height: 154px; }
+  .categoryObject { transform: scale(.74); transform-origin: left center; }
+  .categoryStack > a:hover .categoryObject,
+  .categoryStack > a:focus-visible .categoryObject { transform: scale(.74) translateY(-4px); }
+  .categoryStack > a::after { left: 36px; width: 68px; }
+  .categoryStack h3 { font-size: 25px; }
+}
+@media (max-width: 400px) {
+  .glassMark { width: 68px; height: 64px; }
+  .categoryStack > a { grid-template-columns: 24px 68px minmax(0,1fr); gap: 7px; }
+  .categoryObject { transform: scale(.68); }
+  .categoryStack > a:hover .categoryObject,
+  .categoryStack > a:focus-visible .categoryObject { transform: scale(.68) translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glassMark, .logoSweep, .categoryObject { transition: none; }
+  .glassMark:hover .logoSweep, .glassMark:focus-visible .logoSweep { opacity: 0; }
+}
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto !important;
@@ -3974,4 +4231,76 @@ button:disabled {
   .gateMatrix > div b {
     text-align: right;
   }
+}
+
+/* Release layout: reserve the rendered object width and retain the row arrow. */
+.categoryStack > a {
+  grid-template-columns: 104px minmax(0, 1fr) 30px;
+  column-gap: 18px;
+}
+.categoryStack > a > .categoryObject {
+  width: 92px;
+  max-width: 92px;
+  justify-self: start;
+  overflow: visible;
+}
+.categoryStack > a > div {
+  min-width: 0;
+  position: relative;
+  z-index: 2;
+}
+.categoryStack > a > svg:last-child {
+  display: block;
+  grid-column: 3;
+  width: 18px;
+  height: 18px;
+  justify-self: end;
+}
+.categoryObject.industrialOil { left: -3px; }
+.categoryStack > a::after { left: 0; width: 92px; }
+.categoryStack > a:hover,
+.categoryStack > a:focus-visible { padding-left: 0; }
+@media (max-width: 900px) {
+  .categoryStack > a {
+    grid-template-columns: 104px minmax(0, 1fr) 22px;
+    column-gap: 12px;
+  }
+  .categoryStack > a > svg:last-child {
+    display: block;
+    grid-column: 3;
+    width: 18px;
+    height: 18px;
+  }
+}
+@media (max-width: 620px) {
+  .categoryStack > a {
+    grid-template-columns: 92px minmax(0, 1fr) 20px;
+    column-gap: 8px;
+    padding-right: 2px;
+  }
+  .categoryStack > a > .categoryObject {
+    width: 92px;
+    max-width: 92px;
+  }
+  .categoryStack > a > svg:last-child {
+    display: block;
+    width: 17px;
+    height: 17px;
+  }
+}
+@media (max-width: 400px) {
+  .categoryStack > a {
+    grid-template-columns: 92px minmax(0, 1fr) 18px;
+    column-gap: 6px;
+  }
+  .glassMark::before {
+    inset: 4px -2px -3px 4px;
+    border-color: #b97a173d;
+    box-shadow: 3px 4px 0 #020509, 5px 7px 14px #000a;
+  }
+  .logoDepth {
+    border-color: #f1d17b1c;
+    box-shadow: inset 0 -6px 12px #0007;
+  }
+  .glassMark::after { border-color: #f1d17b18; }
 }

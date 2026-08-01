@@ -33,10 +33,6 @@ import {
   ChevronRight,
   Star,
   Edit3,
-  Fuel,
-  Droplets,
-  FlaskConical,
-  Factory,
   FileCheck2,
   Route as RouteIcon,
   Settings2,
@@ -402,7 +398,10 @@ function NewShell({
     <>
       <header className="masthead">
         <Link to="/" className="glassMark" aria-label="DOP home">
+          <span className="logoHalo" aria-hidden="true" />
+          <span className="logoDepth" aria-hidden="true" />
           <img src="assets/dop-logo-transparent.png" alt="DOP" />
+          <span className="logoSweep" aria-hidden="true" />
         </Link>
         <div className="mastIdentity">
           <b>DIGITAL OIL PROPERTIES GLOBAL</b>
@@ -630,7 +629,38 @@ const categories = [
   "Petrochemicals",
   "Industrial Oils",
 ];
-const categoryIcons = [Fuel, Droplets, FlaskConical, Factory];
+function CategoryObject({ type }: { type: number }) {
+  const names = ["refinedFuel", "lubricant", "petrochemical", "industrialOil"];
+  return (
+    <span className={`categoryObject ${names[type]}`} aria-hidden="true">
+      <span className="objectGlow" />
+      {type === 0 && (
+        <>
+          <span className="tankTop" /><span className="tankBody"><span className="tankBand one" /><span className="tankBand two" /></span>
+          <span className="tankDrop" /><span className="objectBase" />
+        </>
+      )}
+      {type === 1 && (
+        <>
+          <span className="canNeck" /><span className="canShoulder" /><span className="canBody"><span className="canLabel" /></span>
+          <span className="viscousDrop" /><span className="objectBase" />
+        </>
+      )}
+      {type === 2 && (
+        <>
+          <span className="flaskNeck" /><span className="flaskVessel"><span className="flaskLiquid" /></span>
+          <span className="molecule"><i /><i /><i /></span><span className="objectBase" />
+        </>
+      )}
+      {type === 3 && (
+        <>
+          <span className="gear"><i /><i /><i /><i /><b /></span><span className="piston"><i /></span>
+          <span className="oilReservoir" /><span className="objectBase" />
+        </>
+      )}
+    </span>
+  );
+}
 type BenchmarkState = {
   quotes: Record<string, number>;
   usdtUsd?: number;
@@ -1610,11 +1640,9 @@ function MasterHome({
         </div>
         <div className="categoryStack">
           {categories.map((c, i) => {
-            const Icon = categoryIcons[i];
             return (
               <Link to={`/shop?cat=${encodeURIComponent(c)}`} key={c}>
-                <span>0{i + 1}</span>
-                <Icon />
+                <CategoryObject type={i} />
                 <div>
                   <h3>{c}</h3>
                   <p>
