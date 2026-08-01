@@ -734,17 +734,29 @@ function PurposeAndBenchmarks() {
     });
   };
   const marketTiles = [
-    { name: "WTI CRUDE", symbol: "USOIL", unit: "bbl" },
-    { name: "BRENT CRUDE", symbol: "UKOIL", unit: "bbl" },
+    {
+      name: "WTI CRUDE",
+      symbol: "USOIL",
+      unit: "bbl",
+      targetVolume: "1,000,000 bbl",
+    },
+    {
+      name: "BRENT CRUDE",
+      symbol: "UKOIL",
+      unit: "bbl",
+      targetVolume: "1,000,000 bbl",
+    },
     {
       name: "NATURAL GAS",
       symbol: market?.quotes.XNGUSD ? "XNGUSD" : "NG",
       unit: "MMBtu",
+      targetVolume: "100,000 MMBtu",
     },
     {
       name: "ULSD / HEATING OIL",
       symbol: market?.quotes.ULSD ? "ULSD" : "HO",
       unit: "gal",
+      targetVolume: "3,000 US gal",
     },
   ];
   return (
@@ -843,14 +855,21 @@ function PurposeAndBenchmarks() {
           {marketTiles.map((tile) => (
             <article key={tile.name}>
               <span>{tile.name}</span>
-              <b>{loading ? "Loading…" : display(tile.symbol)}</b>
-              <small>
-                {unit} / {tile.unit}
-              </small>
+              <div className="liveQuote">
+                <small>LIVE BENCHMARK</small>
+                <b>{loading ? "Loading…" : display(tile.symbol)}</b>
+                <span>
+                  {unit} / {tile.unit}
+                </span>
+              </div>
+              <dl className="targetVolume">
+                <dt>REFERENCE ORDER SIZE</dt>
+                <dd>{tile.targetVolume}</dd>
+              </dl>
               <em>
                 {market?.quotes[tile.symbol]
                   ? "Secure adapter · " + (market.status || "May be delayed")
-                  : "Quote unavailable"}
+                  : "AWAITING VERIFIED FEED"}
               </em>
             </article>
           ))}
@@ -864,8 +883,9 @@ function PurposeAndBenchmarks() {
           </span>
         </div>
         <p className="benchmarkNotice">
-          Benchmark data is reference context—not a binding product quotation.
-          Physical quotes depend on grade, origin, specification, volume,
+          Benchmark price and reference order size are separate. Market data is
+          context—not a binding product quotation. Physical quotes depend on
+          grade, origin, specification, volume,
           freight, taxes, inspection and commercial terms.{" "}
           <strong>
             USDT display is an indicative conversion, not a payment or
@@ -1018,7 +1038,7 @@ function PhysicalTradeWorkflow() {
         {submitted ? (
           <div className="tradeConfirmation" aria-live="polite">
             <CheckCircle2 />
-            <p className="kicker">LOCAL DEMO STAGED</p>
+            <p className="kicker">REQUEST PREPARED LOCALLY</p>
             <h3>
               {submitted === "buy"
                 ? "Buy request prepared for qualification."
@@ -1140,16 +1160,44 @@ function PhysicalTradeWorkflow() {
             )}
             <button className="primary wide">
               {mode === "buy"
-                ? "Stage physical Buy RFQ"
-                : "Stage supplier Sell offer"}
+                ? "Prepare physical Buy RFQ"
+                : "Prepare supplier Sell offer"}
               <ArrowRight />
             </button>
             <p className="notice">
-              Local demonstration only. No data is transmitted, no public
-              listing is created, no price is locked and no transaction occurs.
+              Pre-production inquiry interface. No data is transmitted, no
+              public listing is created, no price is locked and no transaction
+              occurs.
             </p>
           </form>
         )}
+      </div>
+      <div className="audienceLanes" aria-label="DOP service pathways">
+        <article>
+          <span className="laneBadge">BUYER</span>
+          <h3>Request a physical product quote.</h3>
+          <p>
+            Define product, specification, volume and destination for
+            qualification and commercial review.
+          </p>
+        </article>
+        <article>
+          <span className="laneBadge">SELLER</span>
+          <h3>Submit supply evidence for review.</h3>
+          <p>
+            Supplier identity, authority, specification, origin and product
+            rights must be verified before any matching process.
+          </p>
+        </article>
+        <article className="investorLane">
+          <span className="laneBadge">INVESTOR</span>
+          <h3>Separate service — not currently offered.</h3>
+          <p>
+            Launch requires verified licence scope, approved terms, risk
+            disclosures, custody controls and a production backend. No return
+            or payout is offered on this site.
+          </p>
+        </article>
       </div>
       <div className="whenSell">
         <p className="kicker">WHEN CAN PHYSICAL PRODUCT BE SOLD?</p>
@@ -1195,7 +1243,7 @@ function PhysicalTradeWorkflow() {
           <b>Regulatory boundary.</b> Tokenised or virtual-asset buying,
           exchange or issuance is not offered by this website. Such activity
           would require a separately authorised regulated service. DOP does not
-          claim that licence here, and this demo offers no wallet, deposits,
+          claim that licence here, and this website offers no wallet, deposits,
           USDT settlement, returns or resale liquidity.
         </span>
       </p>
